@@ -1,9 +1,10 @@
 /**
  * Home Page Sections — Achievements, Events, Team, Gallery, About, Footer
  * Each section has a proper `id` for anchor link scrolling from the Navbar.
+ * Includes scroll-reveal animations for a premium feel.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useEvents } from '../hooks/useEvents'
@@ -11,6 +12,23 @@ import { getEventRegistrationCount } from '../api/eventApi'
 import { getTeamMembers } from '../api/teamApi'
 import type { TeamMember } from '../api/teamApi'
 import EventCard from './EventCard'
+
+/* ── Scroll-reveal hook (animate once on viewport entry) ── */
+const useReveal = (threshold = 0.12) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.unobserve(el) } },
+      { threshold, rootMargin: '0px 0px -30px 0px' }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [threshold])
+  return { ref, cls: visible ? 'reveal reveal--visible' : 'reveal' }
+}
 
 /* ── Data ──────────────────────────────────────────────── */
 
@@ -84,9 +102,11 @@ const faqItems = [
 /* ═══════════════════════════════════════════════════════════
    ACHIEVEMENTS
    ═══════════════════════════════════════════════════════════ */
-export const Achievements = () => (
+export const Achievements = () => {
+  const r = useReveal()
+  return (
   <section id="achievements" className="achievements-section">
-    <div className="achievements-section__container">
+    <div className={`achievements-section__container ${r.cls}`} ref={r.ref}>
       <div className="achievements-section__header">
         <span className="achievements-section__badge">
           <span className="achievements-section__badge-dot" />
@@ -102,7 +122,7 @@ export const Achievements = () => (
 
       <div className="achievements-grid">
         {achievements.map((item, i) => (
-          <div className="achievement-card" key={i}>
+          <div className="achievement-card" key={i} style={{ animationDelay: `${i * 0.1}s` }}>
             <div className="achievement-card__icon">{item.icon}</div>
             <span className="achievement-card__stat-value">{item.number}</span>
             <h3 className="achievement-card__stat-title">{item.title}</h3>
@@ -112,17 +132,19 @@ export const Achievements = () => (
       </div>
     </div>
   </section>
-)
+  )
+}
 
 /* ═══════════════════════════════════════════════════════════
    FAQ
    ═══════════════════════════════════════════════════════════ */
 export const FAQ = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  const r = useReveal()
 
   return (
     <section id="faq" className="faq-section">
-      <div className="faq-section__container">
+      <div className={`faq-section__container ${r.cls}`} ref={r.ref}>
         <div className="faq-section__header">
           <span className="faq-section__badge">
             <span className="faq-section__badge-dot" />
@@ -331,6 +353,7 @@ export const Events = () => {
    ═══════════════════════════════════════════════════════════ */
 export const Team = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(defaultTeamMembers)
+  const r = useReveal()
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -352,7 +375,7 @@ export const Team = () => {
 
   return (
     <section id="team" className="team-section">
-      <div className="team-section__container">
+      <div className={`team-section__container ${r.cls}`} ref={r.ref}>
         <div className="team-section__header">
           <span className="team-section__badge">
             <span className="team-section__badge-dot" />
@@ -412,9 +435,11 @@ export const Team = () => {
 /* ═══════════════════════════════════════════════════════════
    GALLERY
    ═══════════════════════════════════════════════════════════ */
-export const Gallery = () => (
+export const Gallery = () => {
+  const r = useReveal()
+  return (
   <section id="gallery" className="gallery-section">
-    <div className="gallery-section__container">
+    <div className={`gallery-section__container ${r.cls}`} ref={r.ref}>
       <div className="gallery-section__header">
         <span className="gallery-section__badge">
           <span className="gallery-section__badge-dot" />
@@ -440,14 +465,17 @@ export const Gallery = () => (
       </div>
     </div>
   </section>
-)
+  )
+}
 
 /* ═══════════════════════════════════════════════════════════
    ABOUT
    ═══════════════════════════════════════════════════════════ */
-export const About = () => (
+export const About = () => {
+  const r = useReveal()
+  return (
   <section id="about" className="about-section">
-    <div className="about-section__container">
+    <div className={`about-section__container ${r.cls}`} ref={r.ref}>
       <div className="about-section__header">
         <span className="about-section__badge">
           <span className="about-section__badge-dot" />
@@ -502,14 +530,17 @@ export const About = () => (
       </div>
     </div>
   </section>
-)
+  )
+}
 
 /* ═══════════════════════════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════════════════════════ */
-export const Footer = () => (
+export const Footer = () => {
+  const r = useReveal(0.08)
+  return (
   <footer className="footer-section">
-    <div className="footer-section__container">
+    <div className={`footer-section__container ${r.cls}`} ref={r.ref}>
       <div className="footer-section__brand">
         <h3 className="footer-section__brand-title">TECHIE BLAZERS</h3>
         <p className="footer-section__brand-tagline">Computer Science &amp; Business Systems</p>
@@ -555,4 +586,5 @@ export const Footer = () => (
       </p>
     </div>
   </footer>
-)
+  )
+}

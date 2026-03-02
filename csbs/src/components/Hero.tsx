@@ -1,9 +1,40 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
+
+/* ── Animated counter hook ── */
+const useCountUp = (end: number, duration = 2000, suffix = '') => {
+  const [count, setCount] = useState(0)
+  const [started, setStarted] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setStarted(true) },
+      { threshold: 0.5 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!started) return
+    let start = 0
+    const step = end / (duration / 16)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= end) { setCount(end); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 16)
+    return () => clearInterval(timer)
+  }, [started, end, duration])
+
+  return { count: `${count}${suffix}`, ref }
+}
 
 const Hero = () => {
   const heroRef = useRef<HTMLElement>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
   const { openAuthModal } = useAuth()
 
   const slides = [
@@ -27,19 +58,38 @@ const Hero = () => {
     },
   ]
 
+  // Entry animation
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Auto-advance carousel
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 4000)
+    }, 5000)
     return () => clearInterval(interval)
   }, [slides.length])
 
-  const goToSlide = (index: number) => setCurrentSlide(index)
-  const goToPrevious = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-  const goToNext = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
+  const goToSlide = useCallback((index: number) => setCurrentSlide(index), [])
+  const goToPrevious = useCallback(() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length), [slides.length])
+  const goToNext = useCallback(() => setCurrentSlide((prev) => (prev + 1) % slides.length), [slides.length])
+
+  // Animated counters
+  const students = useCountUp(500, 2000, '+')
+  const events = useCountUp(50, 1800, '+')
+  const projects = useCountUp(20, 1500, '+')
 
   return (
-    <section className="hero" ref={heroRef} aria-label="Welcome">
+    <section className={`hero ${isVisible ? 'hero--visible' : ''}`} ref={heroRef} aria-label="Welcome">
+      {/* Floating particles background */}
+      <div className="hero__particles" aria-hidden="true">
+        {[...Array(6)].map((_, i) => (
+          <span key={i} className={`hero__particle hero__particle--${i + 1}`} />
+        ))}
+      </div>
+
       <div className="hero__grid">
         {/* LEFT — Text Content */}
         <div className="hero__content">
@@ -55,7 +105,9 @@ const Hero = () => {
           </h1>
 
           <p className="hero__subtitle">
-           Empowering future leaders through technology-driven strategy, intelligent systems, and transformative digital innovation, while fostering creativity, critical thinking, and real-world problem-solving to shape a smarter and more sustainable future.
+            Empowering future leaders through technology-driven strategy, intelligent systems,
+            and transformative digital innovation — fostering creativity, critical thinking,
+            and real-world problem-solving to shape a smarter, more sustainable future.
           </p>
 
           <div className="hero__actions">
@@ -67,31 +119,33 @@ const Hero = () => {
             </a>
             <button type="button" onClick={() => openAuthModal()} className="hero__btn hero__btn--secondary">
               <span>Join Community</span>
+              <svg className="hero__btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
             </button>
           </div>
 
-          {/* Stats row */}
+          {/* Animated Stats row */}
           <div className="hero__stats">
             <div className="hero__stat">
-              <span className="hero__stat-number">500+</span>
+              <span className="hero__stat-number" ref={students.ref}>{students.count}</span>
               <span className="hero__stat-label">Students</span>
             </div>
             <div className="hero__stat-divider" />
             <div className="hero__stat">
-              <span className="hero__stat-number">50+</span>
+              <span className="hero__stat-number" ref={events.ref}>{events.count}</span>
               <span className="hero__stat-label">Events</span>
             </div>
             <div className="hero__stat-divider" />
             <div className="hero__stat">
-              <span className="hero__stat-number">20+</span>
+              <span className="hero__stat-number" ref={projects.ref}>{projects.count}</span>
               <span className="hero__stat-label">Projects</span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT — Visual overlapping the curve boundary */}
+        {/* RIGHT — Visual with enhanced carousel */}
         <div className="hero__visual">
-          {/* Carousel */}
           <div className="hero__carousel">
             <div className="hero__carousel-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
               {slides.map((slide) => (
@@ -100,6 +154,7 @@ const Hero = () => {
                     src={slide.image}
                     alt={slide.title}
                     className="hero__carousel-image"
+                    loading="lazy"
                   />
                   <div className="hero__carousel-overlay">
                     <div className="hero__carousel-content">
@@ -109,6 +164,14 @@ const Hero = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Progress bar */}
+            <div className="hero__carousel-progress">
+              <div
+                className="hero__carousel-progress-bar"
+                key={currentSlide}
+              />
             </div>
 
             {/* Arrow Navigation */}

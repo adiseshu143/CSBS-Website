@@ -13679,3 +13679,374 @@ strong, .font-semibold {
 		transition-duration: 0.01ms !important;
 	}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLL-REVEAL ANIMATION SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
+.reveal {
+	opacity: 0;
+	transform: translateY(40px);
+	transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+	            transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+	will-change: opacity, transform;
+}
+
+.reveal--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Staggered card animations within revealed sections */
+.reveal--visible .achievement-card,
+.reveal--visible .team-member-card,
+.reveal--visible .gallery-image-card,
+.reveal--visible .faq-item,
+.reveal--visible .about-stat-item {
+	animation: cardReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal--visible .achievement-card:nth-child(1),
+.reveal--visible .team-member-card:nth-child(1),
+.reveal--visible .gallery-image-card:nth-child(1),
+.reveal--visible .faq-item:nth-child(1) { animation-delay: 0.05s; }
+.reveal--visible .achievement-card:nth-child(2),
+.reveal--visible .team-member-card:nth-child(2),
+.reveal--visible .gallery-image-card:nth-child(2),
+.reveal--visible .faq-item:nth-child(2) { animation-delay: 0.12s; }
+.reveal--visible .achievement-card:nth-child(3),
+.reveal--visible .team-member-card:nth-child(3),
+.reveal--visible .gallery-image-card:nth-child(3),
+.reveal--visible .faq-item:nth-child(3) { animation-delay: 0.19s; }
+.reveal--visible .achievement-card:nth-child(4),
+.reveal--visible .team-member-card:nth-child(4),
+.reveal--visible .gallery-image-card:nth-child(4),
+.reveal--visible .faq-item:nth-child(4) { animation-delay: 0.26s; }
+.reveal--visible .achievement-card:nth-child(n+5),
+.reveal--visible .team-member-card:nth-child(n+5),
+.reveal--visible .gallery-image-card:nth-child(n+5),
+.reveal--visible .faq-item:nth-child(n+5) { animation-delay: 0.33s; }
+.reveal--visible .team-member-card:nth-child(n+7) { animation-delay: 0.4s; }
+.reveal--visible .team-member-card:nth-child(n+10) { animation-delay: 0.47s; }
+
+@keyframes cardReveal {
+	from { opacity: 0; transform: translateY(24px) scale(0.97); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO ENTRANCE ANIMATION
+   ═══════════════════════════════════════════════════════════ */
+
+.hero {
+	opacity: 0;
+	transition: opacity 0.6s ease;
+}
+.hero--visible {
+	opacity: 1;
+}
+
+.hero--visible .hero__content {
+	animation: heroContentIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+.hero--visible .hero__visual {
+	animation: heroVisualIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+.hero--visible .hero__badge {
+	animation: heroBadgeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+.hero--visible .hero__stats {
+	animation: heroStatsIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+}
+
+@keyframes heroContentIn {
+	from { opacity: 0; transform: translateX(-30px); }
+	to { opacity: 1; transform: translateX(0); }
+}
+@keyframes heroVisualIn {
+	from { opacity: 0; transform: translateX(30px) scale(0.95); }
+	to { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes heroBadgeIn {
+	from { opacity: 0; transform: translateY(-12px) scale(0.9); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes heroStatsIn {
+	from { opacity: 0; transform: translateY(16px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO FLOATING PARTICLES
+   ═══════════════════════════════════════════════════════════ */
+
+.hero__particles {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.hero__particle {
+	position: absolute;
+	border-radius: 50%;
+	opacity: 0.15;
+	animation: particleFloat linear infinite;
+}
+
+.hero__particle--1 {
+	width: 8px; height: 8px;
+	background: #2E3190;
+	top: 15%; left: 10%;
+	animation-duration: 8s;
+}
+.hero__particle--2 {
+	width: 12px; height: 12px;
+	background: #EB4D28;
+	top: 70%; left: 85%;
+	animation-duration: 10s;
+	animation-delay: -2s;
+}
+.hero__particle--3 {
+	width: 6px; height: 6px;
+	background: #2E3190;
+	top: 40%; left: 55%;
+	animation-duration: 7s;
+	animation-delay: -4s;
+}
+.hero__particle--4 {
+	width: 10px; height: 10px;
+	background: #EB4D28;
+	top: 20%; left: 75%;
+	animation-duration: 9s;
+	animation-delay: -1s;
+}
+.hero__particle--5 {
+	width: 5px; height: 5px;
+	background: #2E3190;
+	top: 80%; left: 25%;
+	animation-duration: 11s;
+	animation-delay: -3s;
+}
+.hero__particle--6 {
+	width: 7px; height: 7px;
+	background: #EB4D28;
+	top: 55%; left: 40%;
+	animation-duration: 8.5s;
+	animation-delay: -5s;
+}
+
+@keyframes particleFloat {
+	0% { transform: translate(0, 0) rotate(0deg); opacity: 0.12; }
+	25% { transform: translate(20px, -30px) rotate(90deg); opacity: 0.2; }
+	50% { transform: translate(-15px, -50px) rotate(180deg); opacity: 0.1; }
+	75% { transform: translate(25px, -25px) rotate(270deg); opacity: 0.18; }
+	100% { transform: translate(0, 0) rotate(360deg); opacity: 0.12; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO CAROUSEL PROGRESS BAR
+   ═══════════════════════════════════════════════════════════ */
+
+.hero__carousel-progress {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: rgba(255, 255, 255, 0.2);
+	z-index: 10;
+	border-radius: 0 0 24px 24px;
+	overflow: hidden;
+}
+
+.hero__carousel-progress-bar {
+	height: 100%;
+	background: linear-gradient(90deg, #EB4D28, #2E3190);
+	border-radius: 2px;
+	animation: carouselProgress 5s linear forwards;
+}
+
+@keyframes carouselProgress {
+	from { width: 0%; }
+	to { width: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ENHANCED CARD HOVER EFFECTS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Achievement cards — lift + glow */
+.achievement-card {
+	position: relative;
+	overflow: hidden;
+}
+.achievement-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 50%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+	transition: left 0.6s ease;
+	z-index: 1;
+}
+.achievement-card:hover::before {
+	left: 150%;
+}
+
+/* Team member cards — subtle scale + shadow depth */
+.team-member-card {
+	transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+	            box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.team-member-card:hover {
+	transform: translateY(-8px) scale(1.02) !important;
+	box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.15),
+	            0 0 0 1px rgba(46, 49, 144, 0.1) !important;
+}
+
+/* Gallery cards — zoom + overlay brightness */
+.gallery-image-card {
+	transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+	            box-shadow 0.5s ease;
+}
+.gallery-image-card:hover {
+	transform: scale(1.04);
+	box-shadow: 0 16px 48px rgba(46, 49, 144, 0.2);
+}
+.gallery-image-card:hover .gallery-image-card__image {
+	transform: scale(1.08);
+}
+.gallery-image-card__image {
+	transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* FAQ items — expand with spring */
+.faq-item {
+	transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.faq-item:hover {
+	transform: translateX(4px);
+	border-left-color: #2E3190 !important;
+}
+.faq-item--open {
+	border-left-color: #EB4D28 !important;
+}
+
+/* About stat items — bounce */
+.about-stat-item {
+	transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+	            box-shadow 0.35s ease;
+}
+.about-stat-item:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 32px rgba(46, 49, 144, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION SEPARATOR DECORATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+.achievements-section::after,
+.team-section::after,
+.gallery-section::after,
+.about-section::after {
+	content: '';
+	display: block;
+	width: 60px;
+	height: 3px;
+	background: linear-gradient(90deg, #2E3190, #EB4D28);
+	margin: 0 auto;
+	border-radius: 2px;
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	opacity: 0.4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ENHANCED NAVBAR GLASS EFFECT
+   ═══════════════════════════════════════════════════════════ */
+
+.navbar__link {
+	position: relative;
+}
+.navbar__link::after {
+	content: '';
+	position: absolute;
+	bottom: -4px;
+	left: 50%;
+	width: 0;
+	height: 2px;
+	background: linear-gradient(90deg, #2E3190, #EB4D28);
+	transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+	            left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	border-radius: 2px;
+}
+.navbar__link:hover::after,
+.navbar__link--active::after {
+	width: 100%;
+	left: 0;
+}
+.navbar__link--active::after {
+	background: #EB4D28;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ENHANCED FOOTER STYLING
+   ═══════════════════════════════════════════════════════════ */
+
+.footer-section__link {
+	position: relative;
+	transition: color 0.25s ease, transform 0.25s ease;
+	display: inline-block;
+}
+.footer-section__link:hover {
+	transform: translateX(4px);
+}
+
+.footer-section__bottom {
+	position: relative;
+}
+.footer-section__bottom::before {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 1px;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+	margin-bottom: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SMOOTH SCROLL INDICATOR (back to top)
+   ═══════════════════════════════════════════════════════════ */
+
+.hero__btn--primary {
+	position: relative;
+	overflow: hidden;
+}
+
+.hero__btn--secondary {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Ripple effect on button click */
+.hero__btn--primary:active::after,
+.hero__btn--secondary:active::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: inherit;
+	animation: btnRipple 0.4s ease-out;
+}
+
+@keyframes btnRipple {
+	from { transform: scale(0); opacity: 1; }
+	to { transform: scale(2.5); opacity: 0; }
+}
