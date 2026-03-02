@@ -54,16 +54,16 @@ const galleryImages = [
 const defaultTeamMembers: TeamMember[] = [
   { id: '1', name: 'Dr. M. Venu Gopal', role: 'Principal', initials: 'VG', color: '#EB4D28', cardBg: '#FDF0EC', linkedinUrl: 'https://linkedin.com/in/', email: 'ramesh.kumar@vishnu.edu.in' },
   { id: '2', name: 'M. Sri lakshmi', role: 'Vice Principal', initials: 'SL', color: '#2E3190', cardBg: '#ECEDF8', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
-  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: '/team/archana.jpg', cardBg: '#FFB5DA', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
+  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#FFB5DA', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
   { id: '4', name: 'N. Murari', role: 'Organizer', initials: 'NM', color: '#10B981', cardBg: '#ECFDF5', linkedinUrl: 'https://linkedin.com/in/', email: 'aravind.k@vishnu.edu.in' },
-  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: '/team/vijaya.jpg', cardBg: '#DEBBDC', linkedinUrl: 'https://linkedin.com/in/', email: 'priya.sharma@vishnu.edu.in' },
-  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: '/team/pallavi.jpg', cardBg: '#D8FBFF', linkedinUrl: 'https://linkedin.com/in/', email: 'karthik.v@vishnu.edu.in' },
+  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477610/y0rhvcfknqg7pldt5i68.jpg', cardBg: '#DEBBDC', linkedinUrl: 'https://linkedin.com/in/', email: 'priya.sharma@vishnu.edu.in' },
+  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477648/kr3tqvfchk4crueraw1q.jpg', cardBg: '#D8FBFF', linkedinUrl: 'https://linkedin.com/in/', email: 'karthik.v@vishnu.edu.in' },
   { id: '7', name: 'T. Hari Teja', role: 'Marketing', initials: 'HT', color: '#EC4899', cardBg: '#FDF2F8', linkedinUrl: 'https://linkedin.com/in/', email: 'deepika.r@vishnu.edu.in' },
-  { id: '8', name: 'H. Adiseshu', role: 'Technical Lead', initials: 'HA', color: '#EC4899', photoUrl: '/team/ADISESHU.jpeg', cardBg: '#EFE8D5', linkedinUrl: 'www.linkedin.com/in/adiseshu-hanumanthu', email: '24pa1a5723@vishnu.edu.in' },
-  { id: '9', name: 'G. Akhil', role: 'Technical Co-Lead', initials: 'GA', color: '#EC4899', photoUrl: '/team/akhil.jpg', cardBg: '#E4AEC8', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5721@vishnu.edu.in' },
-  { id: '10', name: 'V. Pranav Sai Bhagath', role: 'Technical Associate', initials: 'PS', color: '#EC4899', photoUrl: '/team/pranav.jpg', cardBg: '#F5EFBF', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
+  { id: '8', name: 'H. Adiseshu', role: 'Technical Lead', initials: 'HA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772472453/waxowu1rwrmac4ofupcd.jpg', cardBg: '#EFE8D5', linkedinUrl: 'www.linkedin.com/in/adiseshu-hanumanthu', email: '24pa1a5723@vishnu.edu.in' },
+  { id: '9', name: 'G. Akhil', role: 'Technical Co-Lead', initials: 'GA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477589/l1okzxtglbjghhe9zdwb.jpg', cardBg: '#E4AEC8', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5721@vishnu.edu.in' },
+  { id: '10', name: 'V. Pranav Sai Bhagath', role: 'Technical Associate', initials: 'PS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477634/iszrfogf01sgdwe3fl7n.jpg', cardBg: '#F5EFBF', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
   { id: '11', name: 'P.Kartheek', role: 'PR Lead', initials: 'PK', color: '#EC4899', cardBg: '#FDF2F8', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
-  { id: '12', name: 'Harshika', role: 'Communication Lead', initials: 'HS', color: '#EC4899', photoUrl: '/team/harshika.jpg', cardBg: '#BAD5EA', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
+  { id: '12', name: 'Harshika', role: 'Communication Lead', initials: 'HS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477738/saxzk3jpcgav1zmyylff.jpg', cardBg: '#BAD5EA', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
 ]
 
 const faqItems = [
