@@ -1,0 +1,161 @@
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useAuth } from './context/AuthContext'
+import { initializeConnectivityMonitoring } from './utils/connectivityCheck'
+import './App.css'
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import AuthModal from './components/AuthModal'
+import { Achievements, Events, Team, Gallery, About, Footer, FAQ } from './components/Sections'
+import ProtectedRoute from './routes/ProtectedRoute'
+import ProtectedAdminRoute from './routes/ProtectedAdminRoute'
+import UserProfile from './pages/UserProfile'
+import AdminLogin from './pages/AdminLogin'
+import AdminProfile from './pages/AdminProfile'
+import AdminTeamManagement from './pages/AdminTeamManagement'
+import EventDetailsPage from './pages/EventDetailsPage'
+import AdminCreateEvent from './pages/AdminCreateEvent'
+
+/* ── Modern Premium Background Layer ──────────────────── */
+const Background = () => (
+	<div className="page__fixed-bg" aria-hidden="true">
+		{/* Soft gradient background */}
+		<div className="bg__gradient" />
+		{/* Subtle accent blob (very light) */}
+		<div className="bg__accent-blob" />
+	</div>
+)
+
+/* ── Home page (Hero + Sections) ──────────────────────── */
+const HomePage = () => (
+	<>
+		<Hero />
+		<AuthModal />
+		<About />
+		<Team />
+		<Gallery />
+		<Events />
+		<Achievements />
+		<FAQ />
+		<Footer />
+	</>
+)
+
+/* ── /profile redirect based on role ──────────────────── */
+const ProfileRedirect = () => {
+	const { user, isAuthenticated, isLoading } = useAuth()
+	const navigate = useNavigate()
+
+	// Use effect to navigate only once when state settles
+	useEffect(() => {
+		if (isLoading) return // Still loading, wait for it to finish
+
+		// After loading is done, navigate based on auth state
+		if (!isAuthenticated || !user) {
+			navigate('/', { replace: true })
+		} else if (user.role === 'admin') {
+			navigate('/admin-profile', { replace: true })
+		} else {
+			navigate('/user-profile', { replace: true })
+		}
+	}, [isLoading, isAuthenticated, user, navigate])
+
+	if (isLoading) {
+		return (
+			<div className="protected-loading">
+				<div className="protected-loading__spinner" />
+				<p className="protected-loading__text">Loading...</p>
+			</div>
+		)
+	}
+
+	// After useEffect handles navigation, return null
+	// (React Router will handle the actual navigation)
+	return null
+}
+
+function App() {
+	const location = useLocation()
+
+	// Monitor route changes and clear admin session when leaving /admin/* routes
+	// Also initialize connectivity monitoring on app startup
+	useEffect(() => {
+		const currentPath = location.pathname
+		const isAdminRoute = currentPath.startsWith('/admin')
+		
+		// If NOT on admin route, immediately clear admin session for security
+		if (!isAdminRoute) {
+			sessionStorage.removeItem('adminVerified')
+		}
+		
+		// Initialize connectivity monitoring on first load (when pathname changes to '/')
+		if (currentPath === '/') {
+			initializeConnectivityMonitoring()
+		}
+	}, [location.pathname])
+
+	return (
+		<div className="page">
+			{/* Permanent fixed background — orange curve, skyline bars, particles */}
+			<Background />
+			<Navbar />
+			<Routes>
+				<Route path="/" element={<HomePage />} />
+
+				{/* Auto-redirect based on role */}
+				<Route path="/profile" element={<ProfileRedirect />} />
+
+				{/* User profile — only "user" role */}
+				<Route
+					path="/user-profile"
+					element={
+						<ProtectedRoute allowedRole="user">
+							<UserProfile />
+						</ProtectedRoute>
+					}
+				/>
+
+				{/* Admin login — public route for admin authentication */}
+				<Route path="/admin" element={<AdminLogin />} />
+
+				{/* Admin profile — only "admin" role with verified access code */}
+				<Route
+					path="/admin/profile"
+					element={
+						<ProtectedAdminRoute>
+							<AdminProfile />
+						</ProtectedAdminRoute>
+					}
+				/>
+
+			{/* Admin: Team Management — admin only */}
+			<Route
+				path="/admin/team"
+				element={
+					<ProtectedAdminRoute>
+						<AdminTeamManagement />
+					</ProtectedAdminRoute>
+				}
+			/>
+
+			{/* Admin: Create Event form — admin role required */}
+				<Route
+					path="/admin/create-event"
+					element={
+						<ProtectedRoute allowedRole="admin">
+							<AdminCreateEvent />
+						</ProtectedRoute>
+					}
+				/>
+
+				{/* Event detail page */}
+				<Route path="/events/:eventId" element={<EventDetailsPage />} />
+
+				{/* Catch-all → home */}
+				<Route path="*" element={<Navigate to="/" replace />} />
+			</Routes>
+		</div>
+	)
+}
+
+export default App

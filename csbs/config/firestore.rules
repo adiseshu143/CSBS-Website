@@ -1,0 +1,98 @@
+rules_version = '2';
+
+// ══════════════════════════════════════════════════════════════
+// Firestore Security Rules — CSBS Website (Spark Plan / No Cloud Functions)
+// ══════════════════════════════════════════════════════════════
+//
+// Architecture:
+//   • All admin operations run DIRECTLY from the client (Firestore SDK)
+//   • No Cloud Functions required (works on free Spark plan)
+//   • Access codes stored in plaintext (single-use, auto-deleted on login)
+//
+// Collections:
+//   users/{uid}                — User/admin profiles
+//   admins/{docId}             — Pre-authorized admin emails (read-only)
+//   adminMeta/{docId}          — Admin counter for code generation
+//   adminCodes/{email}         — Single-use access codes
+//   events/{eventId}           — Event documents (admin write, public read)
+//   eventRegistrations/{regId} — Registration entries
+// ══════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper: check if current user is admin via Firestore profile ─
+    function isAdmin() {
+      return request.auth != null
+             && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+             && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── users/{uid} ─────────────────────────────────────────
+    // Student + Admin Profiles
+    // • Read: any authenticated user (admin eligibility checks query by email)
+    // • Create/Update: own document only
+    match /users/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // ── admins/{docId} ───────────────────────────────────
+    // Pre-approved admin emails (set via Firebase Console)
+    // • Read: PUBLIC (unauthenticated) — needed for eligibility check
+    //   before the user has signed in
+    // • Write: Firebase Console only
+    match /admins/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ── adminMeta/{docId} ───────────────────────────────────
+    // Admin system metadata: counter for auto-increment codes
+    // • Authenticated users can read/write (for code generation transaction)
+    match /adminMeta/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ── adminCodes/{email} ──────────────────────────────────
+    // Single-use access codes for admin login
+    // • Read: PUBLIC (unauthenticated) — needed during eligibility check
+    //   to see if a code already exists before user signs in
+    // • Write: authenticated users only (create/delete codes)
+    match /adminCodes/{email} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // ── events/{eventId} ────────────────────────────────────
+    // Event documents created by admins
+    // • Read:   PUBLIC — all users can browse events
+    // • Create: admin only (role == "admin" in users collection)
+    // • Update: admin only
+    // • Delete: admin only
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── eventRegistrations/{regId} ──────────────────────────
+    // Registration entries for events
+    // • Read:   authenticated users (own registrations or admin)
+    // • Create: any authenticated user
+    // • Update/Delete: admin only
+    match /eventRegistrations/{regId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Catch-all: deny everything else ─────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

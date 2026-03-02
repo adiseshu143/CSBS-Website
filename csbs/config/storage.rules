@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// ══════════════════════════════════════════════════════════════
+// Firebase Storage Rules — CSBS Website
+// ══════════════════════════════════════════════════════════════
+//
+// Paths:
+//   event-banners/{uid}/{filename} — Event banner images uploaded by admins
+//
+// Security:
+//   • Only authenticated users can upload (admin check is done client-side
+//     and enforced by Firestore rules on the event document itself)
+//   • Public read access for serving images
+//   • Max file size: 5 MB
+//   • Only image types allowed
+// ══════════════════════════════════════════════════════════════
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ── Event banner images ─────────────────────────────────
+    match /event-banners/{uid}/{allPaths=**} {
+      // Anyone can read (images are displayed on the public site)
+      allow read: if true;
+
+      // Only the authenticated user whose UID matches can upload
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Catch-all: deny everything else ─────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
