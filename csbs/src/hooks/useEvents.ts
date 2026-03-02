@@ -54,7 +54,11 @@ export function useEvents(): UseEventsReturn {
         setError(null)
       },
       (err) => {
-        console.warn('Firestore events listener error:', err.message)
+        // Silently handle transient Firestore listener errors (stream reconnects automatically)
+        // Only log non-transport errors that indicate actual problems
+        if (!err.message?.includes('transport') && !err.message?.includes('WebChannel')) {
+          console.warn('Firestore events listener error:', err.message)
+        }
         // Fall back to demo events on error
         setEvents(DEMO_EVENTS)
         setLoading(false)

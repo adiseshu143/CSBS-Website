@@ -204,7 +204,6 @@ export async function getEventRegistrationCount(eventId: string): Promise<{ team
   try {
     // Check if user is authenticated before querying
     if (!auth.currentUser) {
-      console.warn('⚠️ User not authenticated - cannot fetch registrations')
       return { teamCount: 0, memberCount: 0 }
     }
     const q = query(
@@ -227,10 +226,12 @@ export async function getEventRegistrationCount(eventId: string): Promise<{ team
   } catch (error: any) {
     // Permission denied - user likely not authenticated
     if (error?.code === 'permission-denied') {
-      console.warn('⚠️ Permission denied reading registrations. User may not be authenticated.')
       return { teamCount: 0, memberCount: 0 }
     }
-    console.error('Error fetching registration count:', error)
+    // Only log unexpected errors (not auth-related ones)
+    if (!error?.message?.includes('auth') && !error?.message?.includes('permission')) {
+      console.error('Error fetching registration count:', error)
+    }
     return { teamCount: 0, memberCount: 0 }
   }
 }

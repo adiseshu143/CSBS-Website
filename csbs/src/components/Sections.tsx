@@ -174,16 +174,21 @@ export const Events = () => {
   const [registrationStats, setRegistrationStats] = useState<Record<string, { teamCount: number; memberCount: number }>>({})
   const isAdmin = user?.role === 'admin'
 
-  // ── Fetch registration counts for all events ──
+  // ── Fetch registration counts for all events (only when authenticated) ──
   useEffect(() => {
+    // Skip polling entirely if user is not authenticated — avoids console spam
+    if (!user) {
+      setRegistrationStats({})
+      return
+    }
+
     const fetchCounts = async () => {
       const stats: Record<string, { teamCount: number; memberCount: number }> = {}
       for (const event of events) {
         try {
           const stat = await getEventRegistrationCount(event.id)
           stats[event.id] = stat
-        } catch (err) {
-          console.error(`Failed to fetch count for ${event.id}:`, err)
+        } catch {
           stats[event.id] = { teamCount: 0, memberCount: 0 }
         }
       }
@@ -192,11 +197,11 @@ export const Events = () => {
 
     if (events.length > 0) {
       fetchCounts()
-      // Refresh every 5 seconds
-      const interval = setInterval(fetchCounts, 5000)
+      // Refresh every 30 seconds (not 5s — reduces Firestore reads)
+      const interval = setInterval(fetchCounts, 30000)
       return () => clearInterval(interval)
     }
-  }, [events])
+  }, [events, user])
 
   /* ── Admin stats ── */
   const totalEvents = events.length

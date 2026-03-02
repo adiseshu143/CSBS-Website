@@ -52,10 +52,9 @@ export const checkAppsScriptConnectivity = async (): Promise<boolean> => {
     } catch (error: any) {
       clearTimeout(timeoutId)
       
-      if (error?.name === 'AbortError') {
-        console.warn('⚠️ Apps Script timeout')
-      } else {
-        console.warn('⚠️ Apps Script unreachable:', error?.message)
+      // Silently handle — these are expected during initial connectivity check
+      if (error?.name !== 'AbortError') {
+        console.debug('[Connectivity] Apps Script check failed:', error?.message)
       }
       
       connectivityStatus.appsScriptReachable = false
