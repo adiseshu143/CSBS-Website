@@ -19,9 +19,13 @@ interface UploadProgress {
   percent: number
 }
 
-// Cloudinary configuration — Read from environment variables
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'REDACTED_CLOUDINARY_CLOUD_NAME'
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'csbs_unsigned'
+// Cloudinary configuration — MUST be set in .env
+const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || ''
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || ''
+
+if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+  console.error('VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET must be configured in .env')
+}
 
 /**
  * Upload profile image to Cloudinary

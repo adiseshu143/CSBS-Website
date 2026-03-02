@@ -48,9 +48,12 @@ export interface AppsScriptResponse {
 }
 
 // ─── Apps Script URL for event registration & Google Sheets sync ─────
-// Read from .env, with fallback to production URL
-const APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL ||
-  'https://script.google.com/macros/s/REDACTED_REGISTRATION_APPS_SCRIPT_DEPLOYMENT_ID/exec'
+// MUST be set in .env — no hardcoded fallback for security
+const APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || ''
+
+if (!APPS_SCRIPT_URL) {
+  console.error('VITE_GOOGLE_APPS_SCRIPT_URL is not configured in .env')
+}
 
 /**
  * Format phone number for consistent storage

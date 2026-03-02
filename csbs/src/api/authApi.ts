@@ -16,10 +16,14 @@ import { logEmailDiagnostics, validateEmailPayload, checkPayloadSizeWarnings } f
 
 // ─── Apps Script URL for admin OTP email delivery ──────
 // Uses a SEPARATE env var from event registration
-// Falls back to production Admin OTP Service URL
+// MUST be set in .env — no hardcoded fallback for security
 const APPS_SCRIPT_URL = import.meta.env.VITE_ADMIN_APPS_SCRIPT_URL ||
   import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL ||
-  'https://script.google.com/macros/s/REDACTED_ADMIN_APPS_SCRIPT_DEPLOYMENT_ID/exec'
+  ''
+
+if (!APPS_SCRIPT_URL) {
+  console.error('VITE_ADMIN_APPS_SCRIPT_URL or VITE_GOOGLE_APPS_SCRIPT_URL is not configured in .env')
+}
 
 // ─── Types ──────────────────────────────────────────────
 export type UserRole = 'user' | 'admin'

@@ -321,8 +321,14 @@ async function generateAccessCode() {
 // HELPER: Send access code email via Google Apps Script
 // ══════════════════════════════════════════════════════════════
 
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/REDACTED_FUNCTIONS_APPS_SCRIPT_DEPLOYMENT_ID/exec";
+// Apps Script URL — set via Firebase Functions environment config:
+// firebase functions:config:set appsscript.url="YOUR_URL_HERE"
+// Or set APPS_SCRIPT_URL env var in .env for Firebase Functions v2
+const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL || '';
+
+if (!APPS_SCRIPT_URL) {
+  console.error('APPS_SCRIPT_URL environment variable is not set. Set it via: firebase functions:secrets:set APPS_SCRIPT_URL');
+}
 
 async function sendAccessCodeEmail(email, accessCode, name, isFirstTime) {
   try {
