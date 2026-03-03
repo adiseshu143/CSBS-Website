@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 // ─── Firebase Configuration (from .env) ─────────────────
@@ -18,8 +18,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 
-// Firebase Auth instance
+// Firebase Auth instance with session-only persistence
+// - browserSessionPersistence: Auth only persists during the browser session
+// - Auto-logs out when user closes the browser/tab
 export const auth = getAuth(app)
+setPersistence(auth, browserSessionPersistence).catch((err) => {
+  console.error('Failed to set auth persistence:', err)
+})
 
 // Firestore instance with offline persistence & long-polling fallback
 // - persistentLocalCache: caches data in IndexedDB for offline use

@@ -289,10 +289,12 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
         <div className="ec2-card__banner-overlay" />
 
         {/* Status badge */}
-        <span className={`ec2-status ${status.className}`}>
-          {event.status === 'ongoing' && <span className="ec2-status__pulse" />}
-          {status.label}
-        </span>
+        {event.status !== 'upcoming' && (
+          <span className={`ec2-status ${status.className}`}>
+            {event.status === 'ongoing' && <span className="ec2-status__pulse" />}
+            {status.label}
+          </span>
+        )}
 
         {/* Date badge */}
         <div className="ec2-card__date-badge">

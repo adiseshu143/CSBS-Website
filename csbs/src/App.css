@@ -504,54 +504,74 @@ strong, .font-semibold {
 /* Tablet and below */
 /* Tablet landscape (768px - 1024px) */
 @media (max-width: 1024px) {
-	.navbar__container {
-		padding: 14px 24px;
-		gap: 20px;
-	}
+   .navbar__container {
+	   padding: 14px 24px;
+	   gap: 20px;
+   }
 
-	.navbar__links {
-		gap: 4px;
-	}
+   .navbar__links {
+	   gap: 4px;
+   }
 
-	.navbar__link {
-		font-size: 13.5px;
-		padding: 8px 14px;
-	}
+   .navbar__link {
+	   font-size: 13.5px;
+	   padding: 8px 14px;
+   }
 
-	.navbar__button {
-		padding: 9px 22px;
-		font-size: 13px;
-	}
+   .navbar__button {
+	   padding: 9px 22px;
+	   font-size: 13px;
+   }
 
-	/* Hero tablet improvements */
-	.hero__grid {
-		grid-template-columns: 1.1fr 1fr;
-		gap: 30px;
-		padding: 40px 32px;
-	}
+   /* Hero tablet improvements */
+   .hero__grid {
+	   grid-template-columns: 1.1fr 1fr;
+	   gap: 30px;
+	   padding: 40px 32px;
+   }
 
-	.hero__title { font-size: 42px; }
-	.hero__subtitle { font-size: 14px; }
+   .hero__title { font-size: 42px; }
+   .hero__subtitle { font-size: 14px; }
 	.hero__actions { gap: 14px; }
-
-	/* Section improvements */
-	.section {
-		padding: 50px 20px;
+/* Mobile: Equal button width and side spacing for hero actions */
+@media (max-width: 480px) {
+	.hero__actions {
+		width: 100%;
+		padding: 0 16px;
+		gap: 10px;
+		margin-left: 20px;
 	}
+	.hero__btn {
+		flex: 1 1 0;
+		min-width: 0;
+		justify-content: center;
+	}
+	.hero__carousel {
+		margin-left: 20px;
+	}
+}
 
-	.section__title { font-size: 36px; }
-	.section__subtitle { font-size: 14px; }
+   /* Section improvements */
+   .section {
+	   padding: 50px 20px;
+   }
 
-	.achievements__grid { grid-template-columns: repeat(2, 1fr); }
-	.team-grid { grid-template-columns: repeat(2, 1fr); }
+   .section__title { font-size: 36px; }
+   .section__subtitle { font-size: 14px; }
+
+   .achievements__grid { grid-template-columns: repeat(2, 1fr); }
+   .team-grid {
+	   grid-template-columns: repeat(2, 1fr);
+	   gap: 16px;
+   }
 }
 
 /* Mobile landscape and below */
 @media (max-width: 768px) {
-	.navbar__container {
-		padding: 12px 20px;
-		gap: 16px;
-	}
+   .navbar__container {
+	   padding: 0;
+	   gap: 16px;
+   }
 	
 	.navbar__brand-title {
 		font-size: 15px;
@@ -580,23 +600,23 @@ strong, .font-semibold {
 
 /* Small mobile */
 @media (max-width: 480px) {
-	.navbar {
-		border-bottom-left-radius: 20px;
-		border-bottom-right-radius: 20px;
-	}
+   .navbar {
+	   border-bottom-left-radius: 20px;
+	   border-bottom-right-radius: 20px;
+   }
 
-	.navbar__container {
-		padding: 10px 16px;
-		gap: 12px;
-	}
+   .navbar__container {
+	   padding: 0;
+	   gap: 12px;
+   }
 
-	.navbar__brand {
-		gap: 10px;
-	}
+   .navbar__brand {
+	   gap: 10px;
+   }
 
-	.navbar__brand-title {
-		font-size: 14px;
-	}
+   .navbar__brand-title {
+	   font-size: 14px;
+   }
 
 	.navbar__brand-subtitle {
 		font-size: 10px;
@@ -5138,7 +5158,18 @@ strong, .font-semibold {
 }
 
 /* ── Title Styles (section headings) ── */
-.achievements-section__title,
+.achievements-section__title {
+	font-family: var(--font-display);
+	font-size: clamp(36px, 5.5vw, 60px);
+	font-weight: 700;
+	color: #ffffff;
+	letter-spacing: 1.5px;
+	line-height: 1.05;
+	margin-bottom: 14px;
+	text-transform: uppercase;
+	word-spacing: 0em;
+}
+
 .events-section__title,
 .team-section__title,
 .gallery-section__title,
@@ -5904,11 +5935,11 @@ strong, .font-semibold {
 
 .team-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-	gap: clamp(20px, 3.5vw, 32px);
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: clamp(24px, 4vw, 36px);
 	position: relative;
 	z-index: 1;
-	margin-top: clamp(16px, 3vw, 32px);
+	margin-top: clamp(20px, 3vw, 40px);
 }
 
 /* ── Team Section Header Enhancement ── */
@@ -5932,47 +5963,50 @@ strong, .font-semibold {
 }
 
 .team-card {
-	background: rgba(255, 255, 255, 0.96);
-	border: 1px solid rgba(78, 91, 216, 0.1);
-	border-radius: 20px;
-	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
-	padding: clamp(20px, 4vw, 32px) clamp(16px, 3vw, 24px);
+	background: rgba(255, 255, 255, 0.98);
+	border: 1px solid rgba(78, 91, 216, 0.12);
+	border-radius: 24px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+	padding: clamp(20px, 5vw, 36px) clamp(16px, 4vw, 28px);
 	text-align: center;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: clamp(8px, 2vw, 14px);
-	transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+	gap: clamp(10px, 2.5vw, 16px);
+	transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 .team-card:hover {
-	transform: translateY(-8px);
-	box-shadow: 0 16px 48px rgba(78, 91, 216, 0.15);
-	border-color: rgba(78, 91, 216, 0.25);
+	transform: translateY(-10px);
+	box-shadow: 0 20px 56px rgba(78, 91, 216, 0.18);
+	border-color: rgba(78, 91, 216, 0.3);
+	background: rgba(255, 255, 255, 0.99);
 }
 
 .team-card__avatar {
-	width: clamp(56px, 10vw, 80px);
-	height: clamp(56px, 10vw, 80px);
+	width: clamp(60px, 11vw, 92px);
+	height: clamp(60px, 11vw, 92px);
 	border-radius: 50%;
 	display: grid;
 	place-items: center;
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	border: 3px solid rgba(255, 255, 255, 0.5);
 }
 
 .team-card:hover .team-card__avatar {
-	transform: scale(1.1);
-	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+	transform: scale(1.12);
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
 }
 
 .team-card__initials {
 	font-family: 'Poppins', sans-serif;
-	font-size: clamp(18px, 3vw, 28px);
+	font-size: clamp(18px, 3.2vw, 32px);
 	font-weight: 700;
 	color: white;
 	letter-spacing: 1px;
 	user-select: none;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .team-card__name {
@@ -6087,9 +6121,17 @@ strong, .font-semibold {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	object-position: center top;
+	object-position: center 20%;
 	display: block;
 	transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Team Member ID 2: Drag image down for perfect visibility ── */
+.team-grid > .team-member-card:nth-child(2) .team-member-card__photo {
+	object-position: center 8%;
+}
+.team-grid > .team-member-card:nth-child(1) .team-member-card__photo {
+	object-position: center 8%;
 }
 
 .team-member-card:hover .team-member-card__photo {
@@ -6360,7 +6402,7 @@ strong, .font-semibold {
 
 .about-section {
 	padding: clamp(60px, 8vw, 100px) clamp(16px, 4vw, 40px);
-	background: linear-gradient(180deg, transparent 0%, transparent 4%, #2E3190 20%, #1a237e 100%);
+	background: #2E3190;
 	position: relative;
 	overflow: hidden;
 }
@@ -6628,7 +6670,7 @@ strong, .font-semibold {
 
 	.about-section {
 		padding: 40px 16px 48px;
-		background: linear-gradient(180deg, transparent 0%, #2E3190 12%, #1a237e 100%);
+		background: #2E3190;
 	}
 
 	.achievements-section__header,
@@ -6771,7 +6813,7 @@ strong, .font-semibold {
 
 	.about-section {
 		padding: 36px 14px 44px;
-		background: linear-gradient(180deg, transparent 0%, #2E3190 10%, #1a237e 100%);
+		background: #2E3190;
 	}
 
 	.achievements-section__header,
@@ -9327,19 +9369,41 @@ strong, .font-semibold {
 	border-color: rgba(235, 77, 40, 0.2);
 }
 
+/* Title header at top */
+.ec2-card__title-header {
+	background: linear-gradient(135deg, #2E3190 0%, #3949ab 100%);
+	padding: 16px 18px;
+	border-bottom: 2px solid rgba(235, 77, 40, 0.15);
+}
+
+.ec2-card__title-header h3 {
+	font-family: 'Poppins', sans-serif;
+	font-size: 18px;
+	font-weight: 700;
+	color: #ffffff;
+	margin: 0;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+}
+
 /* Banner */
 .ec2-card__banner {
 	position: relative;
-	height: 200px;
+	height: 240px;
 	overflow: hidden;
-	background: linear-gradient(135deg, #EB4D28 0%, #2E3190 100%);
+	background: #f1f5f9;
+	padding-top: 45px;
 }
 
 .ec2-card__banner-img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	object-position: center center;
 	transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .ec2-card:hover .ec2-card__banner-img {
@@ -9384,7 +9448,7 @@ strong, .font-semibold {
 /* Status badge */
 .ec2-status {
 	position: absolute;
-	top: 14px;
+	top: 70px;
 	left: 14px;
 	display: inline-flex;
 	align-items: center;
@@ -9403,8 +9467,9 @@ strong, .font-semibold {
 
 .ec2-status--upcoming {
 	background: rgba(46, 49, 144, 0.15);
-	color: #2E3190;
-	border: 1px solid rgba(46, 49, 144, 0.25);
+	color: #ffffff;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .ec2-status--ongoing {
@@ -9472,10 +9537,10 @@ strong, .font-semibold {
 
 /* Card body */
 .ec2-card__body {
-	padding: 22px 22px 20px;
+	padding: 28px 26px 24px;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 16px;
 	flex: 1;
 }
 
@@ -9515,7 +9580,7 @@ strong, .font-semibold {
 
 .ec2-card__title {
 	font-family: 'Poppins', sans-serif;
-	font-size: 19px;
+	font-size: 21px;
 	font-weight: 700;
 	color: #1a1f2e;
 	letter-spacing: -0.02em;
@@ -9816,7 +9881,7 @@ strong, .font-semibold {
 	position: relative;
 	height: 140px;
 	overflow: hidden;
-	background: linear-gradient(135deg, #2E3190, #EB4D28);
+	background: #f1f5f9;
 	flex-shrink: 0;
 }
 
@@ -9825,6 +9890,9 @@ strong, .font-semibold {
 	height: 100%;
 	object-fit: cover;
 	transition: transform 0.5s ease;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .adm-card:hover .adm-card__banner-img {
@@ -10765,8 +10833,17 @@ strong, .font-semibold {
 		border-radius: 20px;
 	}
 
+	.ec2-card__title-header {
+		padding: 14px 16px;
+	}
+
+	.ec2-card__title-header h3 {
+		font-size: 17px;
+	}
+
 	.ec2-card__banner {
-		height: 180px;
+		height: 220px;
+		padding-top: 42px;
 	}
 
 	.ec2-card__body {
@@ -10873,7 +10950,12 @@ strong, .font-semibold {
 	}
 
 	.ec2-card__banner {
-		height: 160px;
+		height: 200px;
+		padding-top: 40px;
+	}
+
+	.ec2-card__title-header h3 {
+		font-size: 15px;
 	}
 
 	.ec2-card__body {
@@ -14050,7 +14132,16 @@ strong, .font-semibold {
 
 	/* Card mobile polish */
 	.ec2-card__banner {
-		height: 160px;
+		height: 140px;
+		padding-top: 32px;
+	}
+
+	.ec2-card__title-header {
+		padding: 12px 14px;
+	}
+
+	.ec2-card__title-header h3 {
+		font-size: 14px;
 	}
 
 	.ec2-card__body {

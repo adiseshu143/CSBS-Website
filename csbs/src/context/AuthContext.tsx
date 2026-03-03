@@ -85,10 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [intendedRoute, setIntendedRoute] = useState<string | null>(null)
-  // Use localStorage for admin verification — persists until explicit logout
-  const [verifiedAdminCode, setVerifiedAdminCode] = useState(() => {
-    return localStorage.getItem('adminVerified') === 'true'
-  })
+  const [verifiedAdminCode, setVerifiedAdminCode] = useState(false)
 
   const openAuthModal = useCallback((route?: string) => {
     setIntendedRoute(route || null)
@@ -121,30 +118,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Listen to Firebase auth state ───────────────────────
   useEffect(() => {
-    // Let Firebase restore the existing session (persisted in IndexedDB).
-    // Admin stays logged in until they explicitly click Logout.
+    // Let Firebase restore the existing session in current browser session.
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         try {
           const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
           if (snap.exists()) {
-            setUser(toUser(snap.data() as UserProfile))
+            const profile = snap.data() as UserProfile
+            setUser(toUser(profile))
+            setVerifiedAdminCode(profile.role === 'admin')
           } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'github.com')) {
             // Social auth user without Firestore profile — create one
             const profile = await ensureSocialUserProfile(firebaseUser)
             setUser(toUser(profile))
+            setVerifiedAdminCode(profile.role === 'admin')
           } else {
             // Auth user exists but no Firestore profile — force cleanup
             await signOut(auth)
-            localStorage.removeItem('adminVerified')
+            setVerifiedAdminCode(false)
             setUser(null)
           }
         } catch {
+          setVerifiedAdminCode(false)
           setUser(null)
         }
       } else {
-        // No Firebase session → clear admin flag too
-        localStorage.removeItem('adminVerified')
         setVerifiedAdminCode(false)
         setUser(null)
       }
@@ -174,15 +172,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const adminLogin = async (email: string, accessCode: string) => {
     setIsLoading(true)
     setVerifiedAdminCode(false) // Reset on each attempt
-    localStorage.removeItem('adminVerified') // Clear flag
     try {
       const result = await adminLoginApi(email, accessCode)
       setUser(toUser(result.user))
       setVerifiedAdminCode(true) // Success → set flag for ProtectedAdminRoute
-      localStorage.setItem('adminVerified', 'true') // Persist until explicit logout
     } catch (err) {
       setVerifiedAdminCode(false) // Failed → reset flag
-      localStorage.removeItem('adminVerified')
       throw new Error(getErrorMessage(err))
     } finally {
       setIsLoading(false)
@@ -231,8 +226,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Logout ──────────────────────────────────────────────
   const logout = async () => {
-    // Always clear admin verification — whether signOut succeeds or not
-    localStorage.removeItem('adminVerified')
     setVerifiedAdminCode(false)
     try {
       await logoutUser()

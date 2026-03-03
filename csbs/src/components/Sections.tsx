@@ -37,10 +37,10 @@ const useReveal = (threshold = 0.12) => {
 /* ── Data ──────────────────────────────────────────────── */
 
 const achievements = [
-  { icon: '🏆', number: '25+', title: 'Hackathon Wins', desc: 'First place victories in national & state-level competitions' },
-  { icon: '🎓', number: '95%', title: 'Placement Rate', desc: 'Consistent placement record with top tech companies' },
-  { icon: '📄', number: '50+', title: 'Research Papers', desc: 'Published in international journals & conferences' },
-  { icon: '💡', number: '100+', title: 'Student Projects', desc: 'Innovative projects solving real-world problems' },
+  { icon: '🏆', number: '50+', title: 'Students', desc: 'Active learners in technology & business systems' },
+  { icon: '🎓', number: '10+', title: 'Faculty Members', desc: 'Experienced educators & academic mentors' },
+  { icon: '📄', number: '3+', title: 'Years of Excellence', desc: 'CSBS Club Established in 2022' },
+  { icon: '💡', number: '15+', title: 'Events Conducted', desc: 'Successfully organized technical, management, and innovation-driven events.' },
 ]
 
 const galleryImages = [
@@ -60,12 +60,12 @@ const teamImgWidth = isMobileDevice ? 200 : 300
 
 // Fallback team data (if Firebase fails)
 const defaultTeamMembers: TeamMember[] = [
-  { id: '1', name: 'Dr. M. Venu Gopal', role: 'Principal', initials: 'VG', color: '#EB4D28',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#E5D0E5', linkedinUrl: 'https://linkedin.com/in/', email: 'ramesh.kumar@vishnu.edu.in' },
-  { id: '2', name: 'M. Sri lakshmi', role: 'Vice Principal', initials: 'SL', color: '#2E3190', cardBg: '#ECEDF8', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
-  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477610/y0rhvcfknqg7pldt5i68.jpg', cardBg: '#FACBE5', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
+  { id: '1', name: 'Dr. M. Venu Gopal', role: 'Principal', initials: 'VG', color: '#EB4D28',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772543950/cwr4zf6bbxdi9jaz9npg.jpg', cardBg: '#E9F0E3', linkedinUrl: 'https://www.linkedin.com/in/venu-mangam-b29267a2?utm_source=share_via&utm_content=profile&utm_medium=member_android', email: 'csbs.vitb@gmail.com' },
+  { id: '2', name: 'M. Sri lakshmi', role: 'Vice Principal', initials: 'SL', color: '#2E3190',photoUrl:'https://res.cloudinary.com/dapwxfafn/image/upload/v1772543958/xyck1wbphnakbjrfmywd.jpg', cardBg: '#CEAFE4', linkedinUrl: 'https://www.linkedin.com/in/srilakshmi-m-b01726175?utm_source=share_via&utm_content=profile&utm_medium=member_android', email: 'csbs.vitb@gmail.com' },
+  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477610/y0rhvcfknqg7pldt5i68.jpg', cardBg: '#FACBE5', linkedinUrl: 'https://linkedin.com/in/', email: 'csbs.vitb@gmail.com' },
   { id: '4', name: 'N. Murari', role: 'Organizer', initials: 'NM', color: '#10B981',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772518899/zqe23rcobq13anitcccq.jpg', cardBg: '#e5dbc2', linkedinUrl: 'https://www.linkedin.com/in/n-murari-33651b300?utm_source=share_via&utm_content=profile&utm_medium=member_android', email: '23pa1a5737@vishnu.edu.in' },
-  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#E5D0E5', linkedinUrl: 'https://linkedin.com/in/', email: 'priya.sharma@vishnu.edu.in' },
-  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477648/kr3tqvfchk4crueraw1q.jpg', cardBg: '#E5FAFA', linkedinUrl: 'https://linkedin.com/in/', email: '23pa1a5705@vishnu.edu.in' },
+  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#E5D0E5', linkedinUrl: 'https://in.linkedin.com/in/vijaya-lakshmi-seeram-a02332342', email: '24pa5a5709@vishnu.edu.in' },
+  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477648/kr3tqvfchk4crueraw1q.jpg', cardBg: '#E5FAFA', linkedinUrl: 'www.linkedin.com/in/bollam-pallavi-88a163331', email: '23pa1a5705@vishnu.edu.in' },
   { id: '7', name: 'T. Hari Teja', role: 'Marketing', initials: 'HT', color: '#EC4899',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515024/ikpt2wtgf5o1tczknq5u.jpg', cardBg: '#a095b8', linkedinUrl: 'https://www.linkedin.com/in/thota-hariteja-199313342?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app', email: '23pa1a5755@vishnu.edu.in' },
   { id: '8', name: 'H. Adiseshu', role: 'Technical Lead', initials: 'HA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772472453/waxowu1rwrmac4ofupcd.jpg', cardBg: '#F0EAE0', linkedinUrl: 'https://www.linkedin.com/in/adiseshu-hanumanthu', email: '24pa1a5723@vishnu.edu.in' },
   { id: '9', name: 'G. Akhil', role: 'Technical Co-Lead', initials: 'GA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477589/l1okzxtglbjghhe9zdwb.jpg', cardBg: '#EAC6DB', linkedinUrl: 'https://www.linkedin.com/in/grandhi-n-v-s-akhil-962997342?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app', email: '24pa1a5721@vishnu.edu.in' },
@@ -118,7 +118,7 @@ export const Achievements = () => {
       <div className="achievements-section__header">
         <span className="achievements-section__badge">
           <span className="achievements-section__badge-dot" />
-          <span style={{color: '#2E3190', fontWeight: 700}}>Our Achievements</span>
+          <span style={{color: '#ffffff', fontWeight: 700}}>Our Achievements</span>
         </span>
         <h2 className="achievements-section__title">
           Celebrating <span style={{color: '#E31B23', fontWeight: 700}}>Excellence</span>

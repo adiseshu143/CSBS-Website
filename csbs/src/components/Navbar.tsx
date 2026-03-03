@@ -7,7 +7,7 @@ const LOGO_URL = 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772522813/
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
-  const { openAuthModal, isAuthenticated, user } = useAuth()
+  const { openAuthModal, isAuthenticated, isLoading, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -39,7 +39,15 @@ const Navbar = () => {
   const toggleMenu = () => setMenuOpen(prev => !prev)
   const closeMenu = () => setMenuOpen(false)
   const handleConnect = () => { closeMenu(); openAuthModal() }
-  const handleProfile = () => { closeMenu(); navigate('/profile') }
+  const showProfileControls = !isLoading && isAuthenticated && !!user?.id
+  const handleProfile = () => {
+    closeMenu()
+    if (showProfileControls) {
+      navigate('/profile')
+    } else {
+      openAuthModal('/profile')
+    }
+  }
 
   /** Smooth-scroll to a section by id. If not on "/", navigate home first. */
   const scrollToSection = (e: React.MouseEvent, sectionId: string) => {
@@ -98,7 +106,7 @@ const Navbar = () => {
 
         </nav>
 
-        {isAuthenticated ? (
+        {showProfileControls ? (
           <div className="navbar__profile-container">
             <button className="navbar__profile-btn" type="button" onClick={handleProfile} aria-label={`Go to profile - ${user?.name}`} title={user?.name}>
               <span className="navbar__profile-avatar">
@@ -137,7 +145,7 @@ const Navbar = () => {
             <a href="#events" className={`navbar__mobile-link ${activeSection === 'events' ? 'navbar__mobile-link--active' : ''}`} onClick={(e) => scrollToSection(e, 'events')}>Events</a>
             <a href="#achievements" className={`navbar__mobile-link ${activeSection === 'achievements' ? 'navbar__mobile-link--active' : ''}`} onClick={(e) => scrollToSection(e, 'achievements')}>Achievements</a>
           </nav>
-          {isAuthenticated ? (
+          {showProfileControls ? (
             <button className="navbar__button navbar__button--mobile" type="button" onClick={handleProfile}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
