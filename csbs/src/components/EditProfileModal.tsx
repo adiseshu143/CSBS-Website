@@ -283,7 +283,7 @@ const EditProfileModal = ({ user, isOpen, onClose, onSuccess }: Props) => {
             <div className="edit-profile__image-section">
               <div className="edit-profile__image-preview">
                 {form.profileImage ? (
-                  <img src={form.profileImage} alt="Profile preview" className="edit-profile__image-img" />
+                  <img src={form.profileImage} alt="Profile preview" className="edit-profile__image-img" width={120} height={120} loading="eager" decoding="async" />
                 ) : (
                   <div className="edit-profile__image-placeholder">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

@@ -82,28 +82,28 @@ const faqItems = [
   },
   {
     id: 2,
-    question: 'What are the admission requirements?',
-    answer: 'To join our CSBS program, candidates must have completed their 12th standard with PCM (Physics, Chemistry, Mathematics) and should meet the eligibility criteria set by VIT Bhimavaram. JEE Main scores are typically required for admission.'
+    question: 'What activities and events are conducted under the CSBS program?',
+    answer: 'The CSBS program conducts hackathons, technical workshops, business competitions, innovation challenges, guest lectures, and career development activities to prepare students for industry and leadership roles.'
   },
   {
     id: 3,
-    question: 'What career opportunities are available after CSBS?',
-    answer: 'Our graduates pursue careers in software development, business analytics, IT consulting, data science, product management, and entrepreneurship. With a 95% placement rate, our students are hired by leading tech companies including Microsoft, Amazon, Google, and Infosys.'
+    question: 'What does CSBS stand for?',
+    answer: 'CSBS stands for Computer Science and Business Systems, integrating advanced computing with strategic business knowledge.'
   },
   {
     id: 4,
-    question: 'Does the department offer internship opportunities?',
-    answer: 'Yes, we facilitate internships through industry partnerships. Our students work with companies to gain practical experience in software development, business analysis, and consulting during their summer and semester breaks.'
+    question: 'What is the vision of CSBS?',
+    answer: 'The vision of CSBS is to create industry-ready professionals who bridge the gap between technology and business leadership.'
   },
   {
     id: 5,
-    question: 'Are there opportunities for research and innovation?',
-    answer: 'Absolutely! We encourage students to participate in research projects, hackathons, and innovation challenges. Our department has published 50+ research papers and supports students in pursuing patents and startups.'
+    question: 'What does the name Techie Blazers represent?',
+    answer: 'Techie Blazers represents students who combine technological expertise with business acumen to innovate, lead, and excel in the digital economy.'
   },
   {
     id: 6,
-    question: 'What extracurricular activities are available?',
-    answer: 'Beyond academics, we organize tech fests, hackathons, coding workshops, guest lectures, and team-building activities. Students can also participate in various clubs and student organizations to enhance their skills and network.'
+    question: 'Who are the Techie Blazers?',
+    answer: 'Techie Blazers are future-ready innovators who blend cutting-edge technology skills with strategic business thinking to create impactful solutions.'
   },
 ]
 
@@ -569,8 +569,13 @@ export const Footer = () => {
   <footer className="footer-section">
     <div className={`footer-section__container ${r.cls}`} ref={r.ref}>
       <div className="footer-section__brand">
-        <h3 className="footer-section__brand-title">TECHIE BLAZERS</h3>
-        <p className="footer-section__brand-tagline">Computer Science &amp; Business Systems</p>
+        <div className="footer-section__brand-row">
+          <img src="https://res.cloudinary.com/dapwxfafn/image/upload/v1772522813/grl5bwexpgw8vqzxk6hv.jpg" alt="Techie Blazers" className="footer-section__brand-logo" width={56} height={56} loading="lazy" decoding="async" />
+          <div className="footer-section__brand-text">
+            <h3 className="footer-section__brand-title">TECHIE BLAZERS</h3>
+            <p className="footer-section__brand-tagline">Computer Science &amp; Business Systems</p>
+          </div>
+        </div>
         <p className="footer-section__brand-description">
           Department of CSBS, Vishnu Institute of Technology, Bhimavaram, Andhra Pradesh.
         </p>
@@ -578,7 +583,7 @@ export const Footer = () => {
 
       <div className="footer-section__column">
         <h4 className="footer-section__column-title">Quick Links</h4>
-        <ul className="footer-section__links-list">
+        <ul className="footer-section__links-grid">
           <li><a href="#achievements" className="footer-section__link">Achievements</a></li>
           <li><a href="#events" className="footer-section__link">Events</a></li>
           <li><a href="#team" className="footer-section__link">Team</a></li>
@@ -608,6 +613,7 @@ export const Footer = () => {
     </div>
 
     <div className="footer-section__bottom">
+      <p className="footer-section__developed">Developed with ❤️ by CSBS Team</p>
       <p className="footer-section__copyright">
         © {new Date().getFullYear()} Techie Blazers — CSBS, VIT Bhimavaram. All rights reserved.
       </p>

@@ -111,7 +111,7 @@ const Navbar = () => {
             <button className="navbar__profile-btn" type="button" onClick={handleProfile} aria-label={`Go to profile - ${user?.name}`} title={user?.name}>
               <span className="navbar__profile-avatar">
                 {user?.profileImage ? (
-                  <img src={user.profileImage} alt={user.name} className="navbar__profile-avatar-img" />
+                  <img src={user.profileImage} alt={user.name} className="navbar__profile-avatar-img" width={40} height={40} loading="eager" decoding="async" />
                 ) : (
                   user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
                 )}

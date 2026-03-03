@@ -149,7 +149,7 @@ const AdminProfile = () => {
             <div className="profile-hero__avatar-wrapper">
               <div className="profile-hero__avatar profile-hero__avatar--admin">
                 {user.profileImage ? (
-                  <img src={user.profileImage} alt="Profile" className="profile-hero__avatar-img" />
+                  <img src={user.profileImage} alt="Profile" className="profile-hero__avatar-img" width={112} height={112} loading="eager" decoding="async" />
                 ) : (
                   <span className="profile-hero__initials">{initials}</span>
                 )}

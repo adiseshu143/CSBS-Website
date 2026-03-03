@@ -3,11 +3,6 @@ import {
   signOut,
   updateProfile,
   createUserWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  type User as FirebaseUser,
 } from 'firebase/auth'
 import {
   doc, setDoc, getDoc, deleteDoc, getDocs,
@@ -57,31 +52,9 @@ export interface UserProfile {
   resumeName?: string
 }
 
-const VISHNU_DOMAIN = 'vishnu.edu.in'
-const REGD_NO_PATTERN = /^[a-z0-9]+$/i
+// Removed unused Google/social login constants and helpers
 
-const parseEmail = (email?: string | null) => {
-  const normalized = (email || '').trim().toLowerCase()
-  const [localPart = '', domain = ''] = normalized.split('@')
-  return { normalized, localPart, domain }
-}
-
-const validateGoogleCollegeEmail = (email?: string | null) => {
-  const { localPart, domain } = parseEmail(email)
-  if (!email || !domain) {
-    return { valid: false, message: 'Google account email not found. Please try again.' }
-  }
-  if (domain !== VISHNU_DOMAIN) {
-    return { valid: false, message: 'Only college Google accounts ending with @vishnu.edu.in are allowed.' }
-  }
-  if (!REGD_NO_PATTERN.test(localPart)) {
-    return {
-      valid: false,
-      message: 'Google sign-in requires a valid registration-number style college email (e.g. 24pa1a5723@vishnu.edu.in).',
-    }
-  }
-  return { valid: true, regdNo: localPart }
-}
+// Removed validateGoogleCollegeEmail
 
 // ─── Register (student) ─────────────────────────────────
 export const registerUser = async (data: RegisterPayload): Promise<void> => {
@@ -532,94 +505,7 @@ export const adminLogin = async (
 }
 
 
-// ─── Social Authentication (Google) — redirect-based ────
-export const initiateGoogleLogin = async (): Promise<void> => {
-  const provider = new GoogleAuthProvider()
-  provider.setCustomParameters({
-    prompt: 'select_account',
-    hd: VISHNU_DOMAIN,
-  })
-  await signInWithRedirect(auth, provider)
-}
-
-// ─── Social Authentication (GitHub) — redirect-based ────
-export const initiateGitHubLogin = async (): Promise<void> => {
-  const provider = new GithubAuthProvider()
-  provider.addScope('user:email')
-  await signInWithRedirect(auth, provider)
-}
-
-// ─── Handle redirect result on page load ────────────────
-export const handleSocialRedirectResult = async (): Promise<{ user: UserProfile; token: string } | null> => {
-  const result = await getRedirectResult(auth)
-  if (!result || !result.user) return null
-  const firebaseUser = result.user
-
-  const googleProviderUsed = result.providerId === 'google.com' || firebaseUser.providerData.some(p => p.providerId === 'google.com')
-  if (googleProviderUsed) {
-    const validation = validateGoogleCollegeEmail(firebaseUser.email)
-    if (!validation.valid) {
-      await signOut(auth)
-      throw new Error(validation.message)
-    }
-  }
-
-  const profile = await ensureSocialUserProfile(firebaseUser)
-  const token = await firebaseUser.getIdToken()
-  return { user: profile, token }
-}
-
-// ─── Create Firestore profile for social auth user if missing ─
-export const ensureSocialUserProfile = async (firebaseUser: FirebaseUser): Promise<UserProfile> => {
-  const validation = validateGoogleCollegeEmail(firebaseUser.email)
-  const isEligibleGoogleUser = firebaseUser.providerData.some(p => p.providerId === 'google.com') && validation.valid
-  let profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
-
-  if (!profileSnap.exists()) {
-    const profile: UserProfile = {
-      uid: firebaseUser.uid,
-      name: firebaseUser.displayName || 'User',
-      email: firebaseUser.email || '',
-      rollNumber: isEligibleGoogleUser ? (validation.regdNo || '') : '',
-      department: 'CSBS',
-      role: 'user',
-      createdAt: new Date().toISOString(),
-      profileImage: firebaseUser.photoURL || undefined,
-    }
-    await setDoc(doc(db, 'users', firebaseUser.uid), profile)
-    profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
-  } else {
-    const profile = profileSnap.data() as UserProfile
-    const updates: Partial<UserProfile> = {}
-
-    if (!profile.profileImage && firebaseUser.photoURL) {
-      updates.profileImage = firebaseUser.photoURL
-    }
-
-    if (!profile.name && firebaseUser.displayName) {
-      updates.name = firebaseUser.displayName
-    }
-
-    if (!profile.email && firebaseUser.email) {
-      updates.email = firebaseUser.email
-    }
-
-    if (!profile.rollNumber && isEligibleGoogleUser) {
-      updates.rollNumber = validation.regdNo || ''
-    }
-
-    if (!profile.department) {
-      updates.department = 'CSBS'
-    }
-
-    if (Object.keys(updates).length > 0) {
-      await setDoc(doc(db, 'users', firebaseUser.uid), updates, { merge: true })
-      profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
-    }
-  }
-
-  return profileSnap.data() as UserProfile
-}
+// Removed all Google/social login logic and exports
 
 
 // ─── Logout ─────────────────────────────────────────────

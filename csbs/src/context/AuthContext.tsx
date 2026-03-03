@@ -7,9 +7,6 @@ import {
   registerUser,
   logoutUser,
   adminLogin as adminLoginApi,
-  initiateGoogleLogin,
-  handleSocialRedirectResult,
-  ensureSocialUserProfile,
   getErrorMessage,
   type UserRole,
   type RegisterPayload,
@@ -41,7 +38,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   adminLogin: (email: string, accessCode: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
-  loginGoogle: () => Promise<void>
+  // Removed loginGoogle
   logout: () => void
   updateUserProfileImage: (imageUrl: string) => void
   updateUserDesignation: (designation: string) => void
@@ -95,33 +92,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIntendedRoute(null)
   }, [])
 
-  // ── Handle social login redirect result on mount ──────
-  // Only check for redirect result if the URL indicates a redirect callback
-  // This handles the case where user is redirected back from Google login
-  useEffect(() => {
-    const checkRedirectResult = async () => {
-      try {
-        const result = await handleSocialRedirectResult()
-        if (result) {
-          console.log('[Social Auth] User logged in via redirect:', result.user.email)
-          setUser(toUser(result.user))
-          closeAuthModal()
-          // Use setTimeout to let state updates settle
-          setTimeout(() => {
-            const userProfile = toUser(result.user)
-            if (userProfile.role === 'admin') {
-              window.location.href = '/admin/profile'
-            } else {
-              window.location.href = '/user-profile'
-            }
-          }, 150)
-        }
-      } catch (err) {
-        console.error('[Social Redirect Error]', err)
-      }
-    }
-    checkRedirectResult()
-  }, [closeAuthModal])
+  // Removed social login redirect effect
 
   // ── Listen to Firebase auth state ───────────────────────
   useEffect(() => {
@@ -134,19 +105,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const profile = snap.data() as UserProfile
             setUser(toUser(profile))
             setVerifiedAdminCode(profile.role === 'admin')
-          } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com')) {
-            // Social auth user without Firestore profile — create one
-            try {
-              const profile = await ensureSocialUserProfile(firebaseUser)
-              setUser(toUser(profile))
-              setVerifiedAdminCode(profile.role === 'admin')
-            } catch (err) {
-              // If ensureSocialUserProfile fails, sign out and clear state
-              console.error('[Social Profile Creation Error]', err)
-              await signOut(auth)
-              setVerifiedAdminCode(false)
-              setUser(null)
-            }
           } else {
             // Auth user exists but no Firestore profile — force cleanup
             await signOut(auth)
@@ -220,15 +178,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // ── Social Login (Google) — redirect-based ───────────────
-  const loginGoogle = async () => {
-    try {
-      await initiateGoogleLogin()
-      // Page will redirect to Google, then back to the app
-    } catch (err) {
-      throw new Error(getErrorMessage(err))
-    }
-  }
+  // Removed loginGoogle
 
   // ── Logout ──────────────────────────────────────────────
   const logout = async () => {
@@ -267,7 +217,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       login,
       adminLogin,
       register,
-      loginGoogle,
+      // loginGoogle removed
       logout,
       updateUserProfileImage,
       updateUserDesignation,
