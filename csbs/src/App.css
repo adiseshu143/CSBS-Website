@@ -6688,7 +6688,18 @@ strong, .font-semibold {
 
 	.gallery-grid {
 		grid-template-columns: repeat(2, 1fr);
-		gap: 12px;
+		gap: 10px;
+		padding: 0 2px;
+	}
+
+	.gallery-image-card {
+		border-radius: 10px;
+		border-width: 1px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	.gallery-image-card__overlay {
+		padding: 12px;
 	}
 
 	.about-section__content {
@@ -6750,9 +6761,12 @@ strong, .font-semibold {
 @media (max-width: 480px) {
 	.achievements-section,
 	.events-section,
-	.team-section,
-	.gallery-section {
+	.team-section {
 		padding: 20px 14px;
+	}
+
+	.gallery-section {
+		padding: 20px 10px;
 	}
 
 	.about-section {
@@ -6924,10 +6938,21 @@ strong, .font-semibold {
 	.gallery-grid {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 8px;
+		padding: 0;
+	}
+
+	.gallery-image-card {
+		border-radius: 8px;
+		border: none;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 	}
 
 	.gallery-image-card__title {
-		font-size: 12px;
+		font-size: 11px;
+	}
+
+	.gallery-image-card__overlay {
+		padding: 8px 10px;
 	}
 
 	.about__content {
