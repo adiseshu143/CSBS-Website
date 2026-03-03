@@ -192,15 +192,6 @@ const Hero = () => {
               ))}
             </div>
 
-            {/* Progress bar */}
-            <div className="hero__carousel-progress">
-              <div
-                className="hero__carousel-progress-bar"
-                key={currentSlide}
-                style={{ animationDuration: `${slides[currentSlide].duration}ms` }}
-              />
-            </div>
-
             {/* Arrow Navigation */}
             <button
               className="hero__carousel-arrow hero__carousel-arrow--left"
