@@ -6343,7 +6343,7 @@ strong, .font-semibold {
 
 .about-section {
 	padding: clamp(60px, 8vw, 100px) clamp(16px, 4vw, 40px);
-	background: linear-gradient(180deg, transparent 0%, transparent 8%, #2E3190 8%, #1a237e 100%);
+	background: linear-gradient(180deg, transparent 0%, transparent 4%, #2E3190 20%, #1a237e 100%);
 	position: relative;
 	overflow: hidden;
 }
@@ -6605,9 +6605,13 @@ strong, .font-semibold {
 	.achievements-section,
 	.events-section,
 	.team-section,
-	.gallery-section,
+	.gallery-section {
+		padding: 24px 16px;
+	}
+
 	.about-section {
-		padding: 6px 16px;
+		padding: 40px 16px 48px;
+		background: linear-gradient(180deg, transparent 0%, #2E3190 12%, #1a237e 100%);
 	}
 
 	.achievements-section__header,
@@ -6615,7 +6619,7 @@ strong, .font-semibold {
 	.team-section__header,
 	.gallery-section__header,
 	.about-section__header {
-		margin-bottom: 6px;
+		margin-bottom: 20px;
 		padding: 18px 16px;
 	}
 
@@ -6671,12 +6675,48 @@ strong, .font-semibold {
 	}
 
 	.about-section__content {
-		gap: 30px;
+		gap: 24px;
+	}
+
+	.about-section__text-block {
+		padding: 24px 20px;
+		border-radius: 16px;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	}
+
+	.about-section__subheading {
+		font-size: 17px;
+		padding-left: 12px;
+		border-left-width: 3px;
+	}
+
+	.about-section__paragraph {
+		font-size: 13px;
+		line-height: 1.75;
 	}
 
 	.about-section__stats-container {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 12px;
+	}
+
+	.about-stat-item {
+		padding: 20px 14px;
+		border-radius: 14px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+	}
+
+	.about-stat-item__icon {
+		font-size: 26px;
+	}
+
+	.about-stat-item__value {
+		font-size: 24px;
+	}
+
+	.about-stat-item__label {
+		font-size: 10px;
+		letter-spacing: 0.06em;
 	}
 
 	.footer-section__container {
@@ -6694,9 +6734,13 @@ strong, .font-semibold {
 	.achievements-section,
 	.events-section,
 	.team-section,
-	.gallery-section,
+	.gallery-section {
+		padding: 20px 14px;
+	}
+
 	.about-section {
-		padding: 4px 14px;
+		padding: 36px 14px 44px;
+		background: linear-gradient(180deg, transparent 0%, #2E3190 10%, #1a237e 100%);
 	}
 
 	.achievements-section__header,
@@ -6705,7 +6749,7 @@ strong, .font-semibold {
 	.gallery-section__header,
 	.about-section__header {
 		padding: 16px 12px;
-		margin-bottom: 4px;
+		margin-bottom: 16px;
 	}
 
 	.achievements-section__title,
