@@ -69,16 +69,13 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
   const status = statusConfig[event.status] || statusConfig.upcoming
   const hasBanner = event.bannerImage && !imgError
 
-  // Handle event deletion
+  // Handle event deletion — Firestore onSnapshot listener auto-removes the card
   const handleDeleteEvent = async () => {
-    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return
-    
     setDeleting(true)
     try {
       await deleteEvent(event.id, true) // true = also delete registrations
       setShowDeleteConfirm(false)
-      // Refresh the page to show updated events list
-      window.location.reload()
+      // No reload needed — useEvents() real-time listener picks up the deletion automatically
     } catch (error) {
       console.error('Delete failed:', error)
       alert('Failed to delete event. Please try again.')
@@ -91,27 +88,47 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
      ═══════════════════════════════════════════════════════ */
   if (isAdmin) {
     return (
-      <div className="adm-card" onClick={() => navigate(`/events/${event.id}`)}>
-        {/* Top colored accent bar */}
-        <div className="adm-card__accent" style={{ background: getTagGradient(event.tag) }} />
+      <div className="adm-card">
+        {/* Banner with gradient fallback */}
+        <div
+          className="adm-card__banner"
+          style={!hasBanner ? { background: getTagGradient(event.tag) } : undefined}
+        >
+          {hasBanner ? (
+            <img
+              src={event.bannerImage}
+              alt={event.title}
+              className="adm-card__banner-img"
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="adm-card__banner-fallback">
+              <span className="adm-card__banner-fallback-icon">
+                {event.tag === 'Hackathon' ? '💻' : event.tag === 'Workshop' ? '🔧' : event.tag === 'Symposium' ? '🎤' : '🚀'}
+              </span>
+            </div>
+          )}
+          <div className="adm-card__banner-overlay" />
+
+          {/* Status badge */}
+          <span className={`adm-card__status ${status.className.replace('ec2-', 'adm-')}`}>
+            {event.status === 'ongoing' && <span className="adm-card__status-dot" />}
+            {status.label}
+          </span>
+
+          {/* Tag pill */}
+          <span className="adm-card__tag-badge">{event.tag}</span>
+        </div>
 
         <div className="adm-card__body">
-          {/* Header row: status + tag */}
-          <div className="adm-card__header">
-            <span className={`adm-card__status ${status.className.replace('ec2-', 'adm-')}`}>
-              {event.status === 'ongoing' && <span className="adm-card__status-dot" />}
-              {status.label}
-            </span>
-            <span className="adm-card__tag">{event.tag}</span>
-          </div>
-
           {/* Title */}
           <h3 className="adm-card__title">{event.title}</h3>
 
           {/* Event meta info */}
           <div className="adm-card__meta">
             <span className="adm-card__meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" />
                 <line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" />
                 <line x1="3" y1="10" x2="21" y2="10" />
@@ -119,7 +136,7 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
               {formatShortDate(event.date)}, {new Date(event.date).getFullYear()}
             </span>
             <span className="adm-card__meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
@@ -140,7 +157,7 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
             </div>
             <div className="adm-card__stat-divider" />
             <div className="adm-card__stat">
-              <span className="adm-card__stat-num">{daysLeft > 0 ? `${daysLeft}d` : 'Closed'}</span>
+              <span className="adm-card__stat-num adm-card__stat-num--deadline">{daysLeft > 0 ? `${daysLeft}d` : 'Closed'}</span>
               <span className="adm-card__stat-label">Deadline</span>
             </div>
           </div>
@@ -205,24 +222,18 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
           {showDeleteConfirm && (
             <div className="adm-card__modal-overlay" onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(false) }}>
               <div className="adm-card__modal" onClick={(e) => e.stopPropagation()}>
-                <div className="adm-card__modal-header">
-                  <h3 className="adm-card__modal-title">Delete Event</h3>
-                  <button
-                    className="adm-card__modal-close"
-                    type="button"
-                    onClick={() => setShowDeleteConfirm(false)}
-                  >
-                    ✕
-                  </button>
+                <div className="adm-card__modal-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
                 </div>
-                <div className="adm-card__modal-body">
-                  <p className="adm-card__modal-text">
-                    Are you sure you want to delete <strong>{event.title}</strong>?
-                  </p>
-                  <p className="adm-card__modal-text adm-card__modal-text--warning">
-                    ⚠️ This will also delete all {teamCount} registration(s) associated with this event. This action cannot be undone.
-                  </p>
-                </div>
+                <h3 className="adm-card__modal-title">Delete Event</h3>
+                <p className="adm-card__modal-text">
+                  Are you sure you want to delete <strong>{event.title}</strong>?
+                  This will also delete all {teamCount} registration(s). This action cannot be undone.
+                </p>
                 <div className="adm-card__modal-actions">
                   <button
                     className="adm-card__modal-btn adm-card__modal-btn--cancel"
@@ -238,7 +249,7 @@ const EventCard = ({ event, teamCount = 0, memberCount = 0 }: EventCardProps) =>
                     onClick={handleDeleteEvent}
                     disabled={deleting}
                   >
-                    {deleting ? 'Deleting...' : 'Yes, Delete Event'}
+                    {deleting ? 'Deleting...' : 'Delete Event'}
                   </button>
                 </div>
               </div>

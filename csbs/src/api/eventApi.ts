@@ -238,29 +238,38 @@ export async function getEventRegistrationCount(eventId: string): Promise<{ team
 
 /**
  * Delete an event and optionally its registrations
- * Only admins can delete events
+ * Deletes the event FIRST (critical), then cleans up registrations (best-effort)
  */
 export async function deleteEvent(eventId: string, deleteRegistrations: boolean = true): Promise<void> {
+  // 1. Delete the event document FIRST (this is the critical operation)
   try {
-    // Delete registrations for this event (optional)
-    if (deleteRegistrations) {
+    await deleteDoc(doc(db, 'events', eventId))
+  } catch (error: any) {
+    const msg = error?.message || String(error)
+    if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
+      throw new Error('Permission denied. Make sure you are logged in as an admin.')
+    }
+    throw new Error(`Failed to delete event: ${msg}`)
+  }
+
+  // 2. Clean up registrations (best-effort — don't block if this fails)
+  if (deleteRegistrations) {
+    try {
       const q = query(
         collection(db, 'eventRegistrations'),
         where('eventId', '==', eventId)
       )
       const snapshot = await getDocs(q)
-      
-      // Delete each registration document
-      const deletePromises = snapshot.docs.map(docSnap =>
-        deleteDoc(doc(db, 'eventRegistrations', docSnap.id))
-      )
-      await Promise.all(deletePromises)
+
+      if (snapshot.size > 0) {
+        const deletePromises = snapshot.docs.map(docSnap =>
+          deleteDoc(doc(db, 'eventRegistrations', docSnap.id))
+        )
+        await Promise.all(deletePromises)
+      }
+    } catch (regError) {
+      // Registration cleanup failed — not critical, event is already deleted
+      console.warn('Registration cleanup failed (event already deleted):', regError)
     }
-    
-    // Delete the event document
-    await deleteDoc(doc(db, 'events', eventId))
-  } catch (error) {
-    console.error('Error deleting event:', error)
-    throw new Error(`Failed to delete event: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }

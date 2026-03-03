@@ -27,19 +27,40 @@ const Background = () => (
 )
 
 /* ── Home page (Hero + Sections) ──────────────────────── */
-const HomePage = () => (
-	<>
-		<Hero />
-		<AuthModal />
-		<About />
-		<Team />
-		<Gallery />
-		<Events />
-		<Achievements />
-		<FAQ />
-		<Footer />
-	</>
-)
+const HomePage = () => {
+	useEffect(() => {
+		// Disable browser scroll restoration so page always starts at top
+		if ('scrollRestoration' in history) {
+			history.scrollRestoration = 'manual'
+		}
+		window.scrollTo(0, 0)
+
+		// Lock scroll during hero entrance animation, then unlock
+		document.body.style.overflow = 'hidden'
+		const timer = setTimeout(() => {
+			document.body.style.overflow = ''
+		}, 1200) // matches longest hero animation delay + duration
+
+		return () => {
+			clearTimeout(timer)
+			document.body.style.overflow = ''
+		}
+	}, [])
+
+	return (
+		<>
+			<Hero />
+			<AuthModal />
+			<About />
+			<Team />
+			<Gallery />
+			<Events />
+			<Achievements />
+			<FAQ />
+			<Footer />
+		</>
+	)
+}
 
 /* ── /profile redirect based on role ──────────────────── */
 const ProfileRedirect = () => {
@@ -54,7 +75,7 @@ const ProfileRedirect = () => {
 		if (!isAuthenticated || !user) {
 			navigate('/', { replace: true })
 		} else if (user.role === 'admin') {
-			navigate('/admin-profile', { replace: true })
+			navigate('/admin/profile', { replace: true })
 		} else {
 			navigate('/user-profile', { replace: true })
 		}
@@ -77,19 +98,9 @@ const ProfileRedirect = () => {
 function App() {
 	const location = useLocation()
 
-	// Monitor route changes and clear admin session when leaving /admin/* routes
-	// Also initialize connectivity monitoring on app startup
+	// Initialize connectivity monitoring on app startup
 	useEffect(() => {
-		const currentPath = location.pathname
-		const isAdminRoute = currentPath.startsWith('/admin')
-		
-		// If NOT on admin route, immediately clear admin session for security
-		if (!isAdminRoute) {
-			sessionStorage.removeItem('adminVerified')
-		}
-		
-		// Initialize connectivity monitoring on first load (when pathname changes to '/')
-		if (currentPath === '/') {
+		if (location.pathname === '/') {
 			initializeConnectivityMonitoring()
 		}
 	}, [location.pathname])

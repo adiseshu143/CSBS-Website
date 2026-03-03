@@ -40,30 +40,30 @@ const achievements = [
 ]
 
 const galleryImages = [
-  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&h=400&fit=crop', title: 'Tech Fest 2025' },
-  { src: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop', title: 'Annual Day' },
-  { src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop', title: 'Coding Workshop' },
-  { src: 'https://images.unsplash.com/photo-1559223607-a43c990c692c?w=600&h=400&fit=crop', title: 'Hackathon Winners' },
-  { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop', title: 'Guest Lectures' },
-  { src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop', title: 'Team Building' },
-  { src: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=600&h=400&fit=crop', title: 'Seminar Hall' },
-  { src: 'https://images.unsplash.com/photo-1560439513-74b037a25d84?w=600&h=400&fit=crop', title: 'Campus Life' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515192/dqdvsbpwymyv3se6vl6z.jpg', title: 'Treasure Hunt', position: 'center' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515218/a1v7tuponx0n8wiyxmbw.jpg', title: 'Quiz Context', position: 'top' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515238/uoffwvfup2coxpqqmiuj.jpg', title: 'Mentoring Session', position: 'top' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515178/u22e9zianrwoysfapaaq.jpg', title: 'Games', position: 'bottom' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515535/zuw1db8uiyt4yjwtnove.jpg', title: 'Team Strategic Game', position: 'top' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515313/syb0jjeixhatiprlzkqr.jpg', title: 'Games', position: 'top' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515832/xntkrxrfnnog8x5orrtg.jpg', title: 'Guidance', position: 'top' },
+  { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515205/hexepks0wrpo8eclpnhh.jpg', title: 'Behind CSBS', position: 'center' },
 ]
 
 // Fallback team data (if Firebase fails)
 const defaultTeamMembers: TeamMember[] = [
-  { id: '1', name: 'Dr. M. Venu Gopal', role: 'Principal', initials: 'VG', color: '#EB4D28', cardBg: '#FDF0EC', linkedinUrl: 'https://linkedin.com/in/', email: 'ramesh.kumar@vishnu.edu.in' },
+  { id: '1', name: 'Dr. M. Venu Gopal', role: 'Principal', initials: 'VG', color: '#EB4D28',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#E5D0E5', linkedinUrl: 'https://linkedin.com/in/', email: 'ramesh.kumar@vishnu.edu.in' },
   { id: '2', name: 'M. Sri lakshmi', role: 'Vice Principal', initials: 'SL', color: '#2E3190', cardBg: '#ECEDF8', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
-  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#FFB5DA', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
-  { id: '4', name: 'N. Murari', role: 'Organizer', initials: 'NM', color: '#10B981', cardBg: '#ECFDF5', linkedinUrl: 'https://linkedin.com/in/', email: 'aravind.k@vishnu.edu.in' },
-  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477610/y0rhvcfknqg7pldt5i68.jpg', cardBg: '#DEBBDC', linkedinUrl: 'https://linkedin.com/in/', email: 'priya.sharma@vishnu.edu.in' },
-  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477648/kr3tqvfchk4crueraw1q.jpg', cardBg: '#D8FBFF', linkedinUrl: 'https://linkedin.com/in/', email: 'karthik.v@vishnu.edu.in' },
-  { id: '7', name: 'T. Hari Teja', role: 'Marketing', initials: 'HT', color: '#EC4899', cardBg: '#FDF2F8', linkedinUrl: 'https://linkedin.com/in/', email: 'deepika.r@vishnu.edu.in' },
-  { id: '8', name: 'H. Adiseshu', role: 'Technical Lead', initials: 'HA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772472453/waxowu1rwrmac4ofupcd.jpg', cardBg: '#EFE8D5', linkedinUrl: 'www.linkedin.com/in/adiseshu-hanumanthu', email: '24pa1a5723@vishnu.edu.in' },
-  { id: '9', name: 'G. Akhil', role: 'Technical Co-Lead', initials: 'GA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477589/l1okzxtglbjghhe9zdwb.jpg', cardBg: '#E4AEC8', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5721@vishnu.edu.in' },
-  { id: '10', name: 'V. Pranav Sai Bhagath', role: 'Technical Associate', initials: 'PS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477634/iszrfogf01sgdwe3fl7n.jpg', cardBg: '#F5EFBF', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
-  { id: '11', name: 'P.Kartheek', role: 'PR Lead', initials: 'PK', color: '#EC4899', cardBg: '#FDF2F8', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
-  { id: '12', name: 'Harshika', role: 'Communication Lead', initials: 'HS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477738/saxzk3jpcgav1zmyylff.jpg', cardBg: '#BAD5EA', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5762@vishnu.edu.in' },
+  { id: '3', name: 'P. Archana', role: 'Faculty Organizer', initials: 'PA', color: '#2E3190', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477610/y0rhvcfknqg7pldt5i68.jpg', cardBg: '#FACBE5', linkedinUrl: 'https://linkedin.com/in/', email: 'sujatha.m@vishnu.edu.in' },
+  { id: '4', name: 'N. Murari', role: 'Organizer', initials: 'NM', color: '#10B981',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772518899/zqe23rcobq13anitcccq.jpg', cardBg: '#e5dbc2', linkedinUrl: 'https://www.linkedin.com/in/n-murari-33651b300?utm_source=share_via&utm_content=profile&utm_medium=member_android', email: '23pa1a5737@vishnu.edu.in' },
+  { id: '5', name: 'S. Vijaya Lakshmi', role: 'Co-Organizer', initials: 'VL', color: '#8B5CF6', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477662/wtuspythd2g4vlcjvngb.jpg', cardBg: '#E5D0E5', linkedinUrl: 'https://linkedin.com/in/', email: 'priya.sharma@vishnu.edu.in' },
+  { id: '6', name: 'B. Pallavi', role: 'Event Management', initials: 'BP', color: '#EF4444', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477648/kr3tqvfchk4crueraw1q.jpg', cardBg: '#E5FAFA', linkedinUrl: 'https://linkedin.com/in/', email: '23pa1a5705@vishnu.edu.in' },
+  { id: '7', name: 'T. Hari Teja', role: 'Marketing', initials: 'HT', color: '#EC4899',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515024/ikpt2wtgf5o1tczknq5u.jpg', cardBg: '#a095b8', linkedinUrl: 'https://www.linkedin.com/in/thota-hariteja-199313342?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app', email: '23pa1a5755@vishnu.edu.in' },
+  { id: '8', name: 'H. Adiseshu', role: 'Technical Lead', initials: 'HA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772472453/waxowu1rwrmac4ofupcd.jpg', cardBg: '#F0EAE0', linkedinUrl: 'https://www.linkedin.com/in/adiseshu-hanumanthu', email: '24pa1a5723@vishnu.edu.in' },
+  { id: '9', name: 'G. Akhil', role: 'Technical Co-Lead', initials: 'GA', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477589/l1okzxtglbjghhe9zdwb.jpg', cardBg: '#EAC6DB', linkedinUrl: 'https://www.linkedin.com/in/grandhi-n-v-s-akhil-962997342?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app', email: '24pa1a5721@vishnu.edu.in' },
+  { id: '10', name: 'V. Pranav Sai Bhagath', role: 'Technical Associate', initials: 'PS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477738/saxzk3jpcgav1zmyylff.jpg', cardBg: '#F5F0D0', linkedinUrl: 'https://www.linkedin.com/in/pranav-sai-bhagath?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app', email: '24pa1a5762@vishnu.edu.in' },
+  { id: '11', name: 'P.Kartheek', role: 'PR Lead', initials: 'PK', color: '#EC4899',photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772478843/msjhhdbrgmmhyreai0c0.jpg', cardBg: '#FAE5DB', linkedinUrl: 'https://linkedin.com/in/', email: '24pa1a5754@vishnu.edu.in' },
+  { id: '12', name: 'Harshika', role: 'Communication Lead', initials: 'HS', color: '#EC4899', photoUrl: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772477634/iszrfogf01sgdwe3fl7n.jpg', cardBg: '#D0E0F0', linkedinUrl: 'https://www.linkedin.com/in/harshika-kilaru-40b98132b?originalSubdomain=in', email: '24pa1a5734@vishnu.edu.in' },
 ]
 
 const faqItems = [
@@ -382,10 +382,10 @@ export const Team = () => {
             Our Team
           </span>
           <h2 className="team-section__title">
-            Meet our <span className="team-section__title-highlight">Experts</span>
+            Meet our <span className="team-section__title-highlight">Team</span>
           </h2>
           <p className="team-section__subtitle">
-            Dedicated educators and industry experts guiding the next generation of tech innovators.
+           Academic leaders dedicated to empowering tomorrow’s tech professionals.
           </p>
         </div>
 
@@ -456,7 +456,7 @@ export const Gallery = () => {
       <div className="gallery-grid">
         {galleryImages.map((img, i) => (
           <div className="gallery-image-card" key={i}>
-            <img src={img.src} alt={img.title} className="gallery-image-card__image" loading="lazy" />
+            <img src={img.src} alt={img.title} className="gallery-image-card__image" loading="lazy" style={{ objectPosition: img.position }} />
             <div className="gallery-image-card__overlay">
               <span className="gallery-image-card__title">{img.title}</span>
             </div>
@@ -485,7 +485,7 @@ export const About = () => {
           Department of <span style={{color: '#E31B23', fontWeight: 700}}>CSBS</span>
         </h2>
         <p className="about-section__subtitle">
-          Pioneering the intersection of computer science and business systems at VIT Bhimavaram.
+          Driving innovation by blending technical expertise with strategic business thinking.
         </p>
       </div>
 
@@ -493,38 +493,34 @@ export const About = () => {
         <div className="about-section__text-block">
           <h3 className="about-section__subheading">Our Vision</h3>
           <p className="about-section__paragraph">
-            To be a center of excellence in Computer Science and Business Systems education,
-            producing industry-ready professionals who can bridge the gap between technology
-            and business strategy.
+            To be a transformative center of excellence in Computer Science and Business Systems, nurturing innovation, leadership, and entrepreneurial mindset to create future-ready professionals who drive technological and business advancement.
           </p>
           <h3 className="about-section__subheading">Our Mission</h3>
           <p className="about-section__paragraph">
-            To provide world-class education combining computer science fundamentals with
-            business acumen, foster innovation through research and hands-on learning, and
-            prepare students for leadership roles in the digital economy.
+           To be a premier center of excellence in Computer Science and Business Systems education, empowering students with technological expertise, strategic thinking, and innovative mindset to lead and shape the future digital economy.
           </p>
         </div>
 
         <div className="about-section__stats-container">
           <div className="about-stat-item">
             <span className="about-stat-item__icon">🎯</span>
-            <span className="about-stat-item__value">2020</span>
+            <span className="about-stat-item__value">2022</span>
             <span className="about-stat-item__label">Established</span>
           </div>
           <div className="about-stat-item">
             <span className="about-stat-item__icon">👨‍🎓</span>
-            <span className="about-stat-item__value">500+</span>
+            <span className="about-stat-item__value">50+</span>
             <span className="about-stat-item__label">Students</span>
           </div>
           <div className="about-stat-item">
             <span className="about-stat-item__icon">👨‍🏫</span>
-            <span className="about-stat-item__value">20+</span>
+            <span className="about-stat-item__value">10+</span>
             <span className="about-stat-item__label">Faculty</span>
           </div>
           <div className="about-stat-item">
-            <span className="about-stat-item__icon">🔬</span>
-            <span className="about-stat-item__value">5</span>
-            <span className="about-stat-item__label">Labs</span>
+            <span className="about-stat-item__icon">🎓</span>
+            <span className="about-stat-item__value">5+</span>
+            <span className="about-stat-item__label">Academic Mentors</span>
           </div>
         </div>
       </div>

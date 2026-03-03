@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { checkAdminEligibility, createAdminAccount, resendAdminCode, getErrorMessage } from '../api/authApi'
+import { requestAdminAccessCode, getErrorMessage } from '../api/authApi'
 
 /**
  * AdminLogin — OTP-based 2-step admin authentication
@@ -69,22 +69,8 @@ const AdminLogin = () => {
 
     setIsChecking(true)
     try {
-      // Check if email is eligible and get/create the account
-      const result = await checkAdminEligibility(emailValue)
-      
-      if (result.needsRegistration) {
-        // New admin — create account + generate & send OTP
-        await createAdminAccount(
-          emailValue,
-          'tempPassword123',
-          emailValue.split('@')[0],
-          'Admin'
-        )
-      } else if (result.accountExists && !result.hasCode) {
-        // Returning admin — account exists but code expired/used → resend OTP
-        await resendAdminCode(emailValue)
-      }
-      // If hasCode is true, admin already has a valid code → go to step 2
+      // Single unified call: checks admins collection, creates/signs-in account, generates code, sends email
+      await requestAdminAccessCode(emailValue)
 
       // Move to OTP verification step
       goToStep('otp-verification')

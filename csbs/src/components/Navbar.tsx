@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logo from '../assets/logo.png'
+
+const LOGO_URL = 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772522813/grl5bwexpgw8vqzxk6hv.jpg'
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -72,7 +73,7 @@ const Navbar = () => {
         <div className="navbar__brand">
           <div className="navbar__logo">
             <img
-              src={logo}
+              src={LOGO_URL}
               alt="Techie Blazers CSBS Logo"
               className="navbar__logo-img"
             />
@@ -99,10 +100,13 @@ const Navbar = () => {
           <div className="navbar__profile-container">
             <button className="navbar__profile-btn" type="button" onClick={handleProfile} aria-label={`Go to profile - ${user?.name}`} title={user?.name}>
               <span className="navbar__profile-avatar">
-                {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                {user?.profileImage ? (
+                  <img src={user.profileImage} alt={user.name} className="navbar__profile-avatar-img" />
+                ) : (
+                  user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                )}
               </span>
             </button>
-            <span className="navbar__profile-name">{user?.name?.split(' ')[0]}</span>
           </div>
         ) : (
           <button className="navbar__button navbar__button--desktop" type="button" onClick={handleConnect}>Connect</button>

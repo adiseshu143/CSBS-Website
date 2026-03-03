@@ -40,21 +40,28 @@ const Hero = () => {
   const slides = [
     {
       id: 1,
-      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800&fit=crop',
-      title: 'Innovation',
-      description: 'Cutting-edge technology and ideas',
+      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp',
+      title: 'VIT Bhimavaram',
+      description: 'A hub of innovation and learning in the heart of Andhra Pradesh',
+      duration: 5000,
+      objectPosition: 'center center',
     },
     {
       id: 2,
-      image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=800&fit=crop',
-      title: 'Technology',
-      description: 'Building the future with code',
+      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg',
+      title: 'Behind the CSBS',
+      description: 'Building the future of tech education at VIT Bhimavaram',
+      duration: 5000,
+      objectPosition: 'center 40%',
     },
     {
       id: 3,
-      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800&fit=crop',
-      title: 'Leadership',
-      description: 'Empowering the next generation',
+      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png',
+      title: 'Computer Science & Business Systems',
+      description: 'Empowering students with the skills and mindset to lead in the digital economy',
+      duration: 5000,
+      objectPosition: 'center center',
+      objectFit: 'contain' as const,
     },
   ]
 
@@ -64,22 +71,22 @@ const Hero = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  // Auto-advance carousel
+  // Auto-advance carousel with per-slide duration
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timeout = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [slides.length])
+    }, slides[currentSlide].duration)
+    return () => clearTimeout(timeout)
+  }, [currentSlide, slides])
 
   const goToSlide = useCallback((index: number) => setCurrentSlide(index), [])
   const goToPrevious = useCallback(() => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length), [slides.length])
   const goToNext = useCallback(() => setCurrentSlide((prev) => (prev + 1) % slides.length), [slides.length])
 
   // Animated counters
-  const students = useCountUp(500, 2000, '+')
-  const events = useCountUp(50, 1800, '+')
-  const projects = useCountUp(20, 1500, '+')
+  const students = useCountUp(100, 1000, '+')
+  const events = useCountUp(25, 1400, '+')
+  const projects = useCountUp(15, 1400, '+')
 
   return (
     <section className={`hero ${isVisible ? 'hero--visible' : ''}`} ref={heroRef} aria-label="Welcome">
@@ -139,7 +146,7 @@ const Hero = () => {
             <div className="hero__stat-divider" />
             <div className="hero__stat">
               <span className="hero__stat-number" ref={projects.ref}>{projects.count}</span>
-              <span className="hero__stat-label">Projects</span>
+              <span className="hero__stat-label">Faculty</span>
             </div>
           </div>
         </div>
@@ -148,13 +155,18 @@ const Hero = () => {
         <div className="hero__visual">
           <div className="hero__carousel">
             <div className="hero__carousel-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {slides.map((slide) => (
+              {slides.map((slide, index) => (
                 <div key={slide.id} className="hero__carousel-slide">
                   <img
                     src={slide.image}
                     alt={slide.title}
                     className="hero__carousel-image"
-                    loading="lazy"
+                    loading={index < 2 ? 'eager' : 'lazy'}
+                    style={{
+                      objectPosition: slide.objectPosition,
+                      objectFit: slide.objectFit || 'cover',
+                      background: slide.objectFit === 'contain' ? 'linear-gradient(180deg, #1a1035 0%, #0f1a2e 40%, #0f1a2e 60%, #1a1035 100%)' : undefined,
+                    }}
                   />
                   <div className="hero__carousel-overlay">
                     <div className="hero__carousel-content">
@@ -171,6 +183,7 @@ const Hero = () => {
               <div
                 className="hero__carousel-progress-bar"
                 key={currentSlide}
+                style={{ animationDuration: `${slides[currentSlide].duration}ms` }}
               />
             </div>
 

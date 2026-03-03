@@ -1,15 +1,124 @@
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { doc, updateDoc } from 'firebase/firestore'
+import { db } from '../firebase/config'
 import { useAuth } from '../context/AuthContext'
+import { uploadProfileImage } from '../utils/uploadUtils'
 
 const AdminProfile = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, updateUserProfileImage, updateUserDesignation, updateUserCustomRole } = useAuth()
   const navigate = useNavigate()
-
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [editingDesignation, setEditingDesignation] = useState(false)
+  const [designationValue, setDesignationValue] = useState('')
+  const [savingDesignation, setSavingDesignation] = useState(false)
+  const designationInputRef = useRef<HTMLInputElement>(null)
+  const [editingRole, setEditingRole] = useState(false)
+  const [roleValue, setRoleValue] = useState('')
+  const [savingRole, setSavingRole] = useState(false)
+  const roleInputRef = useRef<HTMLInputElement>(null)
   if (!user) return null
 
   const handleLogout = async () => {
     await logout()
     navigate('/')
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+
+    setUploading(true)
+    setUploadProgress(0)
+    try {
+      const result = await uploadProfileImage(file, (progress) => {
+        setUploadProgress(progress.percent)
+      })
+
+      // Save to Firestore
+      await updateDoc(doc(db, 'users', user.id), {
+        profileImage: result.secure_url,
+        profileImagePublicId: result.public_id,
+      })
+
+      // Update local state
+      updateUserProfileImage(result.secure_url)
+    } catch (err) {
+      console.error('Image upload failed:', err)
+      alert(err instanceof Error ? err.message : 'Failed to upload image')
+    } finally {
+      setUploading(false)
+      setUploadProgress(0)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const startEditDesignation = () => {
+    setDesignationValue(user.designation || '')
+    setEditingDesignation(true)
+    setTimeout(() => designationInputRef.current?.focus(), 50)
+  }
+
+  const cancelEditDesignation = () => {
+    setEditingDesignation(false)
+    setDesignationValue('')
+  }
+
+  const saveDesignation = async () => {
+    const trimmed = designationValue.trim()
+    if (!trimmed) return cancelEditDesignation()
+
+    setSavingDesignation(true)
+    try {
+      await updateDoc(doc(db, 'users', user.id), { designation: trimmed })
+      updateUserDesignation(trimmed)
+      setEditingDesignation(false)
+    } catch (err) {
+      console.error('Failed to save designation:', err)
+      alert('Failed to save designation')
+    } finally {
+      setSavingDesignation(false)
+    }
+  }
+
+  const handleDesignationKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') saveDesignation()
+    if (e.key === 'Escape') cancelEditDesignation()
+  }
+
+  const startEditRole = () => {
+    setRoleValue(user.customRole || 'System Administrator')
+    setEditingRole(true)
+    setTimeout(() => roleInputRef.current?.focus(), 50)
+  }
+
+  const cancelEditRole = () => {
+    setEditingRole(false)
+    setRoleValue('')
+  }
+
+  const saveRole = async () => {
+    const trimmed = roleValue.trim()
+    if (!trimmed) return cancelEditRole()
+
+    setSavingRole(true)
+    try {
+      await updateDoc(doc(db, 'users', user.id), { customRole: trimmed })
+      updateUserCustomRole(trimmed)
+      setEditingRole(false)
+    } catch (err) {
+      console.error('Failed to save role:', err)
+      alert('Failed to save role')
+    } finally {
+      setSavingRole(false)
+    }
+  }
+
+  const handleRoleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') saveRole()
+    if (e.key === 'Escape') cancelEditRole()
   }
 
   const initials = user.name
@@ -37,12 +146,104 @@ const AdminProfile = () => {
           </button>
 
           <div className="profile-hero__avatar-section">
-            <div className="profile-hero__avatar profile-hero__avatar--admin">
-              <span className="profile-hero__initials">{initials}</span>
-              <span className="profile-hero__status" />
+            <div className="profile-hero__avatar-wrapper">
+              <div className="profile-hero__avatar profile-hero__avatar--admin">
+                {user.profileImage ? (
+                  <img src={user.profileImage} alt="Profile" className="profile-hero__avatar-img" />
+                ) : (
+                  <span className="profile-hero__initials">{initials}</span>
+                )}
+                <span className="profile-hero__status" />
+                {uploading && (
+                  <div className="profile-hero__upload-overlay">
+                    <svg className="profile-hero__upload-spinner" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                    </svg>
+                    <span className="profile-hero__upload-percent">{uploadProgress}%</span>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <button
+                className="profile-hero__edit-btn"
+                onClick={() => fileInputRef.current?.click()}
+                title="Change profile photo"
+                type="button"
+                disabled={uploading}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              </button>
             </div>
             <div className="profile-hero__identity">
               <h1 className="profile-hero__name">{user.name}</h1>
+
+              {/* Editable Designation */}
+              <div className="profile-hero__designation-row">
+                {editingDesignation ? (
+                  <div className="profile-hero__designation-edit">
+                    <input
+                      ref={designationInputRef}
+                      type="text"
+                      className="profile-hero__designation-input"
+                      value={designationValue}
+                      onChange={(e) => setDesignationValue(e.target.value)}
+                      onKeyDown={handleDesignationKeyDown}
+                      placeholder="e.g. Head of Department, Professor..."
+                      maxLength={60}
+                      disabled={savingDesignation}
+                    />
+                    <button
+                      className="profile-hero__designation-save"
+                      onClick={saveDesignation}
+                      disabled={savingDesignation}
+                      type="button"
+                      title="Save"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </button>
+                    <button
+                      className="profile-hero__designation-cancel"
+                      onClick={cancelEditDesignation}
+                      disabled={savingDesignation}
+                      type="button"
+                      title="Cancel"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="profile-hero__designation-display"
+                    onClick={startEditDesignation}
+                    type="button"
+                    title="Click to edit designation"
+                  >
+                    <span className="profile-hero__designation-text">
+                      {user.designation || 'Add your designation'}
+                    </span>
+                    <svg className="profile-hero__designation-pen" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
               <div className="profile-hero__badges">
                 <span className="profile-hero__badge profile-hero__badge--admin">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -80,7 +281,7 @@ const AdminProfile = () => {
             </div>
           </div>
 
-          <div className="profile-info-card">
+          <div className="profile-info-card profile-info-card--editable" onClick={!editingRole ? startEditRole : undefined}>
             <div className="profile-info-card__icon" style={{ background: 'linear-gradient(135deg, #8B5CF6, #A78BFA)' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -88,7 +289,40 @@ const AdminProfile = () => {
             </div>
             <div className="profile-info-card__text">
               <span className="profile-info-card__label">Role</span>
-              <span className="profile-info-card__value">System Administrator</span>
+              {editingRole ? (
+                <div className="profile-info-card__edit-row" onClick={(e) => e.stopPropagation()}>
+                  <input
+                    ref={roleInputRef}
+                    type="text"
+                    className="profile-info-card__edit-input"
+                    value={roleValue}
+                    onChange={(e) => setRoleValue(e.target.value)}
+                    onKeyDown={handleRoleKeyDown}
+                    placeholder="e.g. System Administrator"
+                    maxLength={40}
+                    disabled={savingRole}
+                  />
+                  <button className="profile-info-card__edit-save" onClick={saveRole} disabled={savingRole} type="button" title="Save">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </button>
+                  <button className="profile-info-card__edit-cancel" onClick={cancelEditRole} disabled={savingRole} type="button" title="Cancel">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <span className="profile-info-card__value profile-info-card__value--editable">
+                  {user.customRole || 'System Administrator'}
+                  <svg className="profile-info-card__edit-pen" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </span>
+              )}
             </div>
           </div>
 

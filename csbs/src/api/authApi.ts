@@ -9,7 +9,7 @@ import {
 } from 'firebase/auth'
 import {
   doc, setDoc, getDoc, deleteDoc, getDocs,
-  collection, query, where, limit, runTransaction,
+  collection, query, where, limit,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase/config'
 import { logEmailDiagnostics, validateEmailPayload, checkPayloadSizeWarnings } from '../utils/appsScriptDebug'
@@ -45,6 +45,7 @@ export interface UserProfile {
   role: UserRole
   createdAt: string
   designation?: string
+  customRole?: string
   username?: string
   profileImage?: string
   profileImagePublicId?: string
@@ -109,27 +110,19 @@ export interface EligibilityResult {
   message: string
 }
 
-// ─── Helper: Generate auto-increment code via Firestore transaction ──
-async function generateAccessCode(): Promise<string> {
-  const counterRef = doc(db, 'adminMeta', 'adminCounter')
-
-  const code = await runTransaction(db, async (transaction) => {
-    const counterDoc = await transaction.get(counterRef)
-
-    let current = 0
-    if (counterDoc.exists()) {
-      current = counterDoc.data().current || 0
-    }
-
-    const next = current + 1
-    const formatted = `CSBS-${String(next).padStart(3, '0')}`
-
-    transaction.set(counterRef, { current: next }, { merge: true })
-
-    return formatted
-  })
-
-  return code
+// ─── Helper: Generate secure random access code (CSBS-XXXX) ──────────
+// Uses crypto-safe random when available, falls back to Math.random.
+// Format: CSBS-XXXX where XXXX is a 4-digit random number (0000–9999).
+function generateAccessCode(): string {
+  let digits = ''
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const arr = new Uint32Array(1)
+    crypto.getRandomValues(arr)
+    digits = String(arr[0] % 10000).padStart(4, '0')
+  } else {
+    digits = String(Math.floor(Math.random() * 10000)).padStart(4, '0')
+  }
+  return `CSBS-${digits}`
 }
 
 // ─── Helper: Send access code email via Apps Script ─────
@@ -240,8 +233,8 @@ async function sendAccessCodeEmail(
 // Direct Firestore operations (unauthenticated — public read rules):
 //   1. Query admins collection for email
 //   2. Check if adminCodes/{email} already exists (code was already sent)
-//   3. Check if user profile already exists in users collection
-//   4. Return eligibility result — UI will ask user to register, resend, or login
+//   3. Try to check if user profile exists (may fail if unauthenticated)
+//   4. Return eligibility result
 export const checkAdminEligibility = async (email: string): Promise<EligibilityResult> => {
   if (!email || typeof email !== 'string') {
     throw new Error('Email is required.')
@@ -274,27 +267,33 @@ export const checkAdminEligibility = async (email: string): Promise<EligibilityR
     }
   }
 
-  // 3. Check if admin already has a user profile (returning admin, code was used/expired)
-  const usersSnap = await getDocs(
-    query(
-      collection(db, 'users'),
-      where('email', '==', normalizedEmail),
-      where('role', '==', 'admin'),
-      limit(1)
+  // 3. Try to check if admin already has a user profile
+  //    This may fail if user is unauthenticated (Firestore rules require auth for 'users')
+  //    In that case, we can't tell if account exists — we'll handle it in requestAdminAccessCode
+  try {
+    const usersSnap = await getDocs(
+      query(
+        collection(db, 'users'),
+        where('email', '==', normalizedEmail),
+        where('role', '==', 'admin'),
+        limit(1)
+      )
     )
-  )
 
-  if (!usersSnap.empty) {
-    // Returning admin — account exists but no code. Need to resend OTP.
-    return {
-      eligible: true,
-      accountExists: true,
-      hasCode: false,
-      message: 'Welcome back! A new access code will be sent to your email.',
+    if (!usersSnap.empty) {
+      return {
+        eligible: true,
+        accountExists: true,
+        hasCode: false,
+        message: 'Welcome back! A new access code will be sent to your email.',
+      }
     }
+  } catch (err) {
+    // Can't query users collection (unauthenticated) — that's fine
+    console.warn('[ELIGIBILITY] Could not check users collection (expected when unauthenticated):', err)
   }
 
-  // 4. New admin — no account, no code → needs full registration
+  // 4. New admin OR we couldn't check → needs account setup
   return {
     eligible: true,
     accountExists: false,
@@ -303,130 +302,24 @@ export const checkAdminEligibility = async (email: string): Promise<EligibilityR
   }
 }
 
-// ─── Create admin account ───────────────────────────────
-// Direct Firestore operations:
-//   1. Validate email in allowedAdmins
-//   2. Create Firebase Auth user
-//   3. Create Firestore profile with admin role
-//   4. Generate access code, store in Firestore
-//   5. Email the code via Apps Script
-export const createAdminAccount = async (
-  email: string,
-  password: string,
-  name: string,
-  designation: string = 'Admin'
-): Promise<EligibilityResult> => {
-  const normalizedEmail = email.toLowerCase().trim()
-
-  if (!password || password.length < 6) {
-    throw new Error('Password must be at least 6 characters.')
-  }
-
-  // 1. Verify email is in admins collection
-  const adminsSnap = await getDocs(
-    query(
-      collection(db, 'admins'),
-      where('email', '==', normalizedEmail),
-      limit(1)
-    )
-  )
-
-  if (adminsSnap.empty) {
-    throw new Error('Your email is not authorized for admin access.')
-  }
-
-  // 2. Create Firebase Auth user
-  let adminUser: any
-  try {
-    const credential = await createUserWithEmailAndPassword(auth, normalizedEmail, password)
-    adminUser = credential.user
-
-    await updateProfile(adminUser, { displayName: name })
-  } catch (authErr: any) {
-    console.error('[CREATE ADMIN] Firebase Auth Error Details:', {
-      error: authErr,
-      code: authErr?.code,
-      message: authErr?.message || String(authErr),
-      email: normalizedEmail,
-      passwordLength: password.length,
-    })
-    
-    // Handle Firebase-specific error codes
-    if (authErr?.code === 'auth/email-already-in-use') {
-      throw new Error('An account with this email already exists. Please use a different email or go to login.')
-    }
-    if (authErr?.code === 'auth/invalid-email') {
-      throw new Error('Invalid email address format.')
-    }
-    if (authErr?.code === 'auth/weak-password') {
-      throw new Error('Password must be at least 6 characters.')
-    }
-    if (authErr?.code === 'auth/operation-not-allowed') {
-      throw new Error('Email/Password sign-up is not enabled. Please contact the administrator.')
-    }
-    
-    // Re-throw original error if not handled above
-    if (authErr instanceof Error) {
-      throw authErr
-    }
-    throw new Error('Failed to create Firebase account. Check console for details.')
-  }
-
-  // 3. Create Firestore profile
-  try {
-    await setDoc(doc(db, 'users', adminUser.uid), {
-      uid: adminUser.uid,
-      name,
-      email: normalizedEmail,
-      rollNumber: '',
-      department: 'CSBS',
-      role: 'admin',
-      designation: designation || 'Admin',
-      createdAt: new Date().toISOString(),
-    })
-  } catch (err) {
-    console.error('Firestore profile creation failed:', err)
-    throw new Error('Failed to create admin profile. Please try again.')
-  }
-
-  // 4. Generate access code (user is now authenticated, can write to Firestore)
-  const plainCode = await generateAccessCode()
-
-  await setDoc(doc(db, 'adminCodes', normalizedEmail), {
-    accessCode: plainCode,
-    createdAt: new Date().toISOString(),
-  })
-
-  // 5. Email the code via Apps Script
-  await sendAccessCodeEmail(normalizedEmail, plainCode, name, true)
-
-  console.log(`[ADMIN] Account created for ${normalizedEmail}, code: ${plainCode}`)
-
-  // Sign out so admin can log in fresh with code
-  await signOut(auth)
-
-  return {
-    eligible: true,
-    accountExists: true,
-    hasCode: false,
-    message: 'Admin account created! Access code has been sent to your email.',
-  }
-}
-
-// ─── Resend admin access code (returning admin) ─────────
-// For admins who already have an account but their code was used/expired.
+// ─── Request Admin Access Code (unified flow) ───────────
+// Single robust function that handles BOTH new and returning admins.
 // Flow:
-//   1. Verify email is in admins collection
-//   2. Sign in with Firebase Auth (internal password)
-//   3. Generate new access code, store in Firestore
-//   4. Email the code via Apps Script
-//   5. Sign out so admin can log in fresh with code
-export const resendAdminCode = async (
+//   1. Verify email is in admins collection (public read)
+//   2. Try to create Firebase Auth account
+//      - If new → create account + profile
+//      - If already exists → sign in with internal password
+//   3. Generate access code, store in Firestore adminCodes
+//   4. Send code via Apps Script email
+//   5. Sign out so admin can log in fresh with the code
+export const requestAdminAccessCode = async (
   email: string
 ): Promise<EligibilityResult> => {
   const normalizedEmail = email.toLowerCase().trim()
+  const INTERNAL_PASSWORD = 'tempPassword123'
+  const displayName = normalizedEmail.split('@')[0]
 
-  // 1. Verify email is in admins collection
+  // 1. Verify email is in admins collection (public read — always works)
   const adminsSnap = await getDocs(
     query(
       collection(db, 'admins'),
@@ -439,47 +332,101 @@ export const resendAdminCode = async (
     throw new Error('Your email is not authorized for admin access.')
   }
 
-  // 2. Sign in to get write access to Firestore
-  const INTERNAL_ADMIN_PASSWORD = 'tempPassword123'
+  console.log('[ADMIN] ✅ Email verified in admins collection:', normalizedEmail)
+
+  // 2. Create or sign in to Firebase Auth to get write access
+  let adminUser: any
+  let isNewAccount = false
+
   try {
-    await signInWithEmailAndPassword(auth, normalizedEmail, INTERNAL_ADMIN_PASSWORD)
+    // Try creating a new account first
+    const credential = await createUserWithEmailAndPassword(auth, normalizedEmail, INTERNAL_PASSWORD)
+    adminUser = credential.user
+    isNewAccount = true
+    await updateProfile(adminUser, { displayName })
+    console.log('[ADMIN] ✅ New Firebase Auth account created')
   } catch (authErr: any) {
-    console.error('[RESEND] Firebase Auth error:', authErr?.code, authErr?.message)
-    throw new Error('Authentication failed. Please contact administrator.')
+    if (authErr?.code === 'auth/email-already-in-use') {
+      // Account already exists — sign in instead
+      console.log('[ADMIN] Account already exists, signing in...')
+      try {
+        const credential = await signInWithEmailAndPassword(auth, normalizedEmail, INTERNAL_PASSWORD)
+        adminUser = credential.user
+        console.log('[ADMIN] ✅ Signed in to existing account')
+      } catch (signInErr: any) {
+        console.error('[ADMIN] Sign in failed:', signInErr?.code, signInErr?.message)
+        throw new Error('Authentication failed. Please contact the administrator.')
+      }
+    } else {
+      console.error('[ADMIN] Account creation error:', authErr?.code, authErr?.message)
+      throw new Error('Failed to set up admin account. Please try again.')
+    }
   }
 
-  // 3. Get admin name from profile
-  const userSnap = await getDocs(
-    query(
-      collection(db, 'users'),
-      where('email', '==', normalizedEmail),
-      limit(1)
-    )
-  )
-  const adminName = userSnap.empty ? normalizedEmail.split('@')[0] : (userSnap.docs[0].data().name || normalizedEmail.split('@')[0])
+  // 3. Create Firestore profile if new account
+  if (isNewAccount) {
+    try {
+      await setDoc(doc(db, 'users', adminUser.uid), {
+        uid: adminUser.uid,
+        name: displayName,
+        email: normalizedEmail,
+        rollNumber: '',
+        department: 'CSBS',
+        role: 'admin',
+        designation: 'Admin',
+        createdAt: new Date().toISOString(),
+      })
+      console.log('[ADMIN] ✅ Firestore profile created')
+    } catch (err) {
+      console.error('[ADMIN] Profile creation failed:', err)
+      // Continue anyway — profile might already exist from a previous attempt
+    }
+  }
 
-  // 4. Generate new access code
-  const plainCode = await generateAccessCode()
+  // 4. Generate access code and store in Firestore (now authenticated — can write)
+  const accessCode = generateAccessCode()
 
-  await setDoc(doc(db, 'adminCodes', normalizedEmail), {
-    accessCode: plainCode,
-    createdAt: new Date().toISOString(),
-  })
+  try {
+    await setDoc(doc(db, 'adminCodes', normalizedEmail), {
+      accessCode,
+      createdAt: new Date().toISOString(),
+    })
+    console.log('[ADMIN] ✅ Access code stored in Firestore:', accessCode)
+  } catch (err) {
+    console.error('[ADMIN] Failed to store access code:', err)
+    await signOut(auth)
+    throw new Error('Failed to generate access code. Please try again.')
+  }
 
-  // 5. Email the code via Apps Script (isFirstTime = false → login template)
-  await sendAccessCodeEmail(normalizedEmail, plainCode, adminName, false)
+  // 5. Send access code email via Apps Script
+  await sendAccessCodeEmail(normalizedEmail, accessCode, displayName, isNewAccount)
+  console.log('[ADMIN] ✅ Access code email sent to', normalizedEmail)
 
-  console.log(`[ADMIN] Resent code for ${normalizedEmail}, code: ${plainCode}`)
-
-  // Sign out so admin can log in fresh with code
+  // 6. Sign out so admin can log in fresh with the code
   await signOut(auth)
 
   return {
     eligible: true,
     accountExists: true,
     hasCode: true,
-    message: 'A new access code has been sent to your email.',
+    message: 'Access code has been sent to your email.',
   }
+}
+
+// Keep legacy exports for backward compatibility
+export const createAdminAccount = async (
+  email: string,
+  _password: string,
+  _name: string,
+  _designation: string = 'Admin'
+): Promise<EligibilityResult> => {
+  return requestAdminAccessCode(email)
+}
+
+export const resendAdminCode = async (
+  email: string
+): Promise<EligibilityResult> => {
+  return requestAdminAccessCode(email)
 }
 
 // ─── Admin Login (Access Code Only — No Password) ────────
@@ -631,8 +578,15 @@ export const logoutUser = async (): Promise<void> => {
 
 // ─── Error helper ───────────────────────────────────────
 export const getErrorMessage = (error: unknown): string => {
+  // Log the full error for debugging
+  console.error('[Auth Error]', error)
+
   if (error instanceof Error) {
     const msg = error.message
+    const code = (error as { code?: string }).code || ''
+
+    // Check both error.code (FirebaseError) and error.message
+    const check = (str: string) => msg.includes(str) || code.includes(str)
 
     // Firebase Auth error codes (already extracted by createAdminAccount)
     if (msg.includes('email already exists')) return msg // Uses our custom message
@@ -642,19 +596,24 @@ export const getErrorMessage = (error: unknown): string => {
     if (msg.includes('Failed to create Firebase')) return msg
 
     // Fallback: Original Firebase error handling
-    if (msg.includes('auth/email-already-in-use')) return 'An account with this email already exists.'
-    if (msg.includes('auth/invalid-email')) return 'Invalid email address.'
-    if (msg.includes('auth/weak-password')) return 'Password must be at least 6 characters.'
-    if (msg.includes('auth/user-not-found')) return 'No account found with this email.'
-    if (msg.includes('auth/wrong-password')) return 'Incorrect password.'
-    if (msg.includes('auth/invalid-credential')) return 'Invalid email or password.'
-    if (msg.includes('auth/too-many-requests')) return 'Too many attempts. Please try again later.'
-    if (msg.includes('auth/network-request-failed')) return 'Network error. Check your connection.'
-    if (msg.includes('auth/user-disabled')) return 'This account has been disabled.'
-    if (msg.includes('auth/operation-not-allowed')) return 'Email/Password sign-up is not enabled. Contact the administrator.'
-    if (msg.includes('auth/popup-closed-by-user')) return 'Sign-in was cancelled.'
-    if (msg.includes('auth/popup-blocked')) return 'Sign-in popup was blocked. Please allow popups and try again.'
-    if (msg.includes('auth/cancelled-popup-request')) return 'Sign-in was cancelled.'
+    if (check('auth/email-already-in-use')) return 'An account with this email already exists.'
+    if (check('auth/invalid-email')) return 'Invalid email address.'
+    if (check('auth/weak-password')) return 'Password must be at least 6 characters.'
+    if (check('auth/user-not-found')) return 'No account found with this email.'
+    if (check('auth/wrong-password')) return 'Incorrect password.'
+    if (check('auth/invalid-credential')) return 'Invalid email or password.'
+    if (check('auth/too-many-requests')) return 'Too many attempts. Please try again later.'
+    if (check('auth/network-request-failed')) return 'Network error. Check your connection.'
+    if (check('auth/user-disabled')) return 'This account has been disabled.'
+    if (check('auth/operation-not-allowed')) return 'This sign-in method is not enabled. Contact the administrator.'
+    if (check('auth/popup-closed-by-user')) return 'Sign-in was cancelled.'
+    if (check('auth/popup-blocked')) return 'Sign-in popup was blocked. Please allow popups and try again.'
+    if (check('auth/cancelled-popup-request')) return 'Sign-in was cancelled.'
+    if (check('auth/unauthorized-domain')) return 'This domain is not authorized for sign-in. Please contact the administrator to add this domain in Firebase Console.'
+    if (check('auth/account-exists-with-different-credential')) return 'An account already exists with the same email but a different sign-in method. Try signing in with email/password instead.'
+    if (check('auth/credential-already-in-use')) return 'This credential is already linked to another account.'
+    if (check('auth/internal-error')) return 'An internal error occurred. Please try again.'
+    if (check('auth/invalid-api-key')) return 'Invalid API key. Please contact the administrator.'
 
     // Admin errors
     if (msg.includes('Invalid access code')) return 'Invalid access code. Please try again.'

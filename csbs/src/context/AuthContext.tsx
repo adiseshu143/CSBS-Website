@@ -23,6 +23,9 @@ interface User {
   rollNumber: string
   department: string
   role: UserRole
+  profileImage?: string
+  designation?: string
+  customRole?: string
 }
 
 interface AuthContextType {
@@ -40,6 +43,9 @@ interface AuthContextType {
   loginGoogle: () => Promise<void>
   loginGitHub: () => Promise<void>
   logout: () => void
+  updateUserProfileImage: (imageUrl: string) => void
+  updateUserDesignation: (designation: string) => void
+  updateUserCustomRole: (customRole: string) => void
 }
 
 interface RegisterData {
@@ -66,6 +72,9 @@ const toUser = (profile: UserProfile): User => ({
   rollNumber: profile.rollNumber,
   department: profile.department,
   role: profile.role,
+  profileImage: profile.profileImage,
+  designation: profile.designation,
+  customRole: profile.customRole,
 })
 
 // ─── Provider ─────────────────────────────────────────────
@@ -74,9 +83,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [intendedRoute, setIntendedRoute] = useState<string | null>(null)
-  // Use sessionStorage for admin verification — clears on browser close
+  // Use localStorage for admin verification — persists until explicit logout
   const [verifiedAdminCode, setVerifiedAdminCode] = useState(() => {
-    return sessionStorage.getItem('adminVerified') === 'true'
+    return localStorage.getItem('adminVerified') === 'true'
   })
 
   const openAuthModal = useCallback((route?: string) => {
@@ -91,40 +100,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Listen to Firebase auth state ───────────────────────
   useEffect(() => {
-    // Sign out any existing Firebase session on app load
-    // Users must explicitly login each session
-    const clearAndListen = async () => {
-      try {
-        await signOut(auth)
-      } catch {
-        // Ignore errors on sign out
-      }
-
-      const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
-        if (firebaseUser) {
-          try {
-            const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
-            if (snap.exists()) {
-              setUser(toUser(snap.data() as UserProfile))
-            } else {
-              // Auth user exists but no Firestore profile — shouldn't happen
-              setUser(null)
-            }
-          } catch {
+    // Let Firebase restore the existing session (persisted in IndexedDB).
+    // Admin stays logged in until they explicitly click Logout.
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        try {
+          const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
+          if (snap.exists()) {
+            setUser(toUser(snap.data() as UserProfile))
+          } else {
+            // Auth user exists but no Firestore profile — force cleanup
+            await signOut(auth)
+            localStorage.removeItem('adminVerified')
             setUser(null)
           }
-        } else {
+        } catch {
           setUser(null)
         }
-        setIsLoading(false)
-      })
-      return () => unsubscribe()
-    }
+      } else {
+        // No Firebase session → clear admin flag too
+        localStorage.removeItem('adminVerified')
+        setVerifiedAdminCode(false)
+        setUser(null)
+      }
+      setIsLoading(false)
+    })
 
-    const unsubscribePromise = clearAndListen()
-    return () => {
-      unsubscribePromise.then(unsub => unsub?.())
-    }
+    return () => unsubscribe()
   }, [])
 
   // ── Login (student) ──────────────────────────────────────
@@ -147,15 +149,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const adminLogin = async (email: string, accessCode: string) => {
     setIsLoading(true)
     setVerifiedAdminCode(false) // Reset on each attempt
-    sessionStorage.removeItem('adminVerified') // Clear session flag
+    localStorage.removeItem('adminVerified') // Clear flag
     try {
       const result = await adminLoginApi(email, accessCode)
       setUser(toUser(result.user))
       setVerifiedAdminCode(true) // Success → set flag for ProtectedAdminRoute
-      sessionStorage.setItem('adminVerified', 'true') // Persist in session only
+      localStorage.setItem('adminVerified', 'true') // Persist until explicit logout
     } catch (err) {
       setVerifiedAdminCode(false) // Failed → reset flag
-      sessionStorage.removeItem('adminVerified')
+      localStorage.removeItem('adminVerified')
       throw new Error(getErrorMessage(err))
     } finally {
       setIsLoading(false)
@@ -212,16 +214,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Logout ──────────────────────────────────────────────
   const logout = async () => {
+    // Always clear admin verification — whether signOut succeeds or not
+    localStorage.removeItem('adminVerified')
+    setVerifiedAdminCode(false)
     try {
       await logoutUser()
     } catch {
       // Fallback: clear state even if Firebase signOut fails
-    sessionStorage.removeItem('adminVerified') // Clear session storage
     }
     setUser(null)
-    setVerifiedAdminCode(false) // Clear admin verification flag
   }
 
+  // ── Update profile image in local state ─────────────────
+  const updateUserProfileImage = useCallback((imageUrl: string) => {
+    setUser(prev => prev ? { ...prev, profileImage: imageUrl } : null)
+  }, [])
+
+  // ── Update designation in local state ────────────────────
+  const updateUserDesignation = useCallback((designation: string) => {
+    setUser(prev => prev ? { ...prev, designation } : null)
+  }, [])
+  // ── Update custom role in local state ────────────────────────
+  const updateUserCustomRole = useCallback((customRole: string) => {
+    setUser(prev => prev ? { ...prev, customRole } : null)
+  }, [])
   return (
     <AuthContext.Provider value={{
       user,
@@ -238,6 +254,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loginGoogle,
       loginGitHub,
       logout,
+      updateUserProfileImage,
+      updateUserDesignation,
+      updateUserCustomRole,
     }}>
       {children}
     </AuthContext.Provider>
