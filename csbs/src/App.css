@@ -228,6 +228,20 @@ strong, .font-semibold {
 	box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+	.navbar__container {
+		padding: 16px 18px;
+		gap: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.navbar__container {
+		padding: 14px 14px;
+		gap: 12px;
+	}
+}
+
 .navbar__brand {
 	display: flex;
 	align-items: center;
@@ -919,6 +933,22 @@ strong, .font-semibold {
 	box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+	.hero__grid {
+		grid-template-columns: 1fr;
+		gap: 28px;
+		padding: 24px 16px;
+		min-height: auto;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__grid {
+		gap: 20px;
+		padding: 20px 14px;
+	}
+}
+
 /* ---- LEFT: Content (on the dark background) ---- */
 .hero__content {
 	position: relative;
@@ -994,6 +1024,20 @@ strong, .font-semibold {
 	max-width: 100%;
 }
 
+@media (max-width: 768px) {
+	.hero__title {
+		font-size: clamp(28px, 6vw, 48px);
+		letter-spacing: 2px;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__title {
+		font-size: 26px;
+		letter-spacing: 1.5px;
+	}
+}
+
 .hero__title-gradient {
 	background: linear-gradient(135deg, #2E3190, #24277A);
 	-webkit-background-clip: text;
@@ -1023,6 +1067,22 @@ strong, .font-semibold {
 	animation: fadeSlideUp 0.8s ease 0.65s both;
 }
 
+@media (max-width: 768px) {
+	.hero__actions {
+		gap: 12px;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__actions {
+		flex-direction: column;
+		width: 100%;
+		gap: 10px;
+	}
+}
+
 .hero__btn {
 	display: inline-flex;
 	align-items: center;
@@ -1039,6 +1099,16 @@ strong, .font-semibold {
 	overflow: hidden;
 	letter-spacing: 0.07em;
 	white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+	.hero__btn {
+		padding: 12px 24px;
+		font-size: 14px;
+		width: 100%;
+		justify-content: center;
+		border-radius: 14px;
+	}
 }
 
 .hero__btn--primary {
@@ -1112,6 +1182,24 @@ strong, .font-semibold {
 	animation: fadeSlideUp 0.8s ease 0.8s both;
 }
 
+@media (max-width: 768px) {
+	.hero__stats {
+		justify-content: center;
+		padding: 14px 18px;
+		border-radius: 14px;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__stats {
+		flex-wrap: wrap;
+		gap: 16px;
+		padding: 12px 12px;
+		border-radius: 12px;
+		margin-top: 14px;
+	}
+}
+
 .hero__stat {
 	display: flex;
 	flex-direction: column;
@@ -1168,6 +1256,24 @@ strong, .font-semibold {
 		0 0 0 1px rgba(248, 250, 252, 0.06) inset;
 	animation: fadeSlideUp 0.8s ease 0.4s both;
 	display: flex;
+}
+
+@media (max-width: 768px) {
+	.hero__carousel {
+		height: 280px;
+		border-radius: 16px;
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(248, 250, 252, 0.06) inset;
+	}
+}
+
+@media (max-width: 480px) {
+	.hero__carousel {
+		height: 220px;
+		border-radius: 14px;
+		width: 100%;
+		max-width: 100%;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(248, 250, 252, 0.06) inset;
+	}
 }
 
 .hero__carousel-track {
@@ -5123,6 +5229,30 @@ strong, .font-semibold {
 	margin-right: auto;
 }
 
+@media (max-width: 768px) {
+	.achievements-section__header,
+	.events-section__header,
+	.team-section__header,
+	.gallery-section__header,
+	.about-section__header {
+		padding: 18px 20px;
+		margin-bottom: 32px;
+		border-radius: 18px;
+	}
+}
+
+@media (max-width: 480px) {
+	.achievements-section__header,
+	.events-section__header,
+	.team-section__header,
+	.gallery-section__header,
+	.about-section__header {
+		padding: 16px 14px;
+		margin-bottom: 24px;
+		border-radius: 14px;
+	}
+}
+
 /* ── Badge Styles (used in all sections) ── */
 .achievements-section__badge,
 .events-section__badge,
@@ -5170,6 +5300,22 @@ strong, .font-semibold {
 	word-spacing: 0em;
 }
 
+@media (max-width: 768px) {
+	.achievements-section__title {
+		font-size: 28px;
+		letter-spacing: 1.2px;
+		margin-bottom: 12px;
+	}
+}
+
+@media (max-width: 480px) {
+	.achievements-section__title {
+		font-size: 24px;
+		letter-spacing: 1px;
+		margin-bottom: 10px;
+	}
+}
+
 .events-section__title,
 .team-section__title,
 .gallery-section__title,
@@ -5183,6 +5329,28 @@ strong, .font-semibold {
 	margin-bottom: 14px;
 	text-transform: uppercase;
 	word-spacing: 0em;
+}
+
+@media (max-width: 768px) {
+	.events-section__title,
+	.team-section__title,
+	.gallery-section__title,
+	.about-section__title {
+		font-size: 28px;
+		letter-spacing: 1.2px;
+		margin-bottom: 12px;
+	}
+}
+
+@media (max-width: 480px) {
+	.events-section__title,
+	.team-section__title,
+	.gallery-section__title,
+	.about-section__title {
+		font-size: 24px;
+		letter-spacing: 1px;
+		margin-bottom: 10px;
+	}
 }
 
 /* ── Title Highlight (accent color) ── */
@@ -5212,6 +5380,28 @@ strong, .font-semibold {
 	line-height: 1.8;
 	letter-spacing: 0.5px;
 	word-spacing: 0.15em;
+}
+
+@media (max-width: 768px) {
+	.achievements-section__subtitle,
+	.events-section__subtitle,
+	.team-section__subtitle,
+	.gallery-section__subtitle,
+	.about-section__subtitle {
+		font-size: 13px;
+		line-height: 1.6;
+	}
+}
+
+@media (max-width: 480px) {
+	.achievements-section__subtitle,
+	.events-section__subtitle,
+	.team-section__subtitle,
+	.gallery-section__subtitle,
+	.about-section__subtitle {
+		font-size: 12px;
+		line-height: 1.5;
+	}
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -5284,6 +5474,31 @@ strong, .font-semibold {
 	transform: translateY(-10px);
 	box-shadow: 0 16px 48px rgba(46, 49, 144, 0.2);
 	border-color: rgba(46, 49, 144, 0.2);
+}
+
+@media (max-width: 768px) {
+	.achievement-card {
+		padding: 18px 16px;
+		border-radius: 16px;
+		min-height: auto;
+	}
+
+	.achievement-card:hover {
+		transform: translateY(-6px);
+		box-shadow: 0 12px 32px rgba(46, 49, 144, 0.15);
+	}
+}
+
+@media (max-width: 480px) {
+	.achievement-card {
+		padding: 16px 14px;
+		border-radius: 14px;
+		min-height: auto;
+	}
+
+	.achievement-card:hover {
+		transform: translateY(-3px);
+	}
 }
 
 .achievement-card__icon {
@@ -6539,6 +6754,21 @@ strong, .font-semibold {
 	gap: clamp(30px, 5vw, 50px);
 }
 
+@media (max-width: 768px) {
+	.footer-section__container {
+		padding: 32px 16px 20px;
+		gap: 28px;
+	}
+}
+
+@media (max-width: 480px) {
+	.footer-section__container {
+		grid-template-columns: 1fr;
+		padding: 24px 14px 16px;
+		gap: 24px;
+	}
+}
+
 .footer-section__brand-title {
 	font-family: var(--font-heading);
 	font-size: clamp(20px, 3vw, 28px);
@@ -6546,6 +6776,13 @@ strong, .font-semibold {
 	color: #F8FAFC;
 	margin: 0 0 8px;
 	letter-spacing: -0.5px;
+}
+
+@media (max-width: 480px) {
+	.footer-section__brand-title {
+		font-size: 18px;
+		margin-bottom: 6px;
+	}
 }
 
 .footer-section__brand-tagline {
@@ -6558,6 +6795,14 @@ strong, .font-semibold {
 	letter-spacing: 0.6px;
 }
 
+@media (max-width: 480px) {
+	.footer-section__brand-tagline {
+		font-size: 11px;
+		margin-bottom: 12px;
+		letter-spacing: 0.4px;
+	}
+}
+
 .footer-section__brand-description {
 	font-family: 'Inter', sans-serif;
 	font-size: clamp(13px, 1.2vw, 15px);
@@ -6567,6 +6812,14 @@ strong, .font-semibold {
 	margin: 0;
 }
 
+@media (max-width: 480px) {
+	.footer-section__brand-description {
+		font-size: 12px;
+		line-height: 1.6;
+		max-width: 100%;
+	}
+}
+
 .footer-section__column-title {
 	font-family: var(--font-heading);
 	font-size: clamp(14px, 1.5vw, 18px);
@@ -6574,6 +6827,13 @@ strong, .font-semibold {
 	color: #F8FAFC;
 	margin: 0 0 16px;
 	letter-spacing: -0.3px;
+}
+
+@media (max-width: 480px) {
+	.footer-section__column-title {
+		font-size: 14px;
+		margin-bottom: 12px;
+	}
 }
 
 .footer-section__link {
@@ -6588,6 +6848,12 @@ strong, .font-semibold {
 .footer-section__link:hover {
 	color: #EB4D28;
 	transform: translateX(2px);
+}
+
+@media (max-width: 480px) {
+	.footer-section__link {
+		font-size: 13px;
+	}
 }
 
 .footer-section__contact-item {
@@ -6605,11 +6871,24 @@ strong, .font-semibold {
 	text-align: center;
 }
 
+@media (max-width: 480px) {
+	.footer-section__bottom {
+		padding: 14px 14px;
+		margin-top: 8px;
+	}
+}
+
 .footer-section__copyright {
 	font-family: 'Inter', sans-serif;
 	font-size: clamp(11px, 1vw, 13px);
 	color: rgba(248, 250, 252, 0.6);
 	margin: 0;
+}
+
+@media (max-width: 480px) {
+	.footer-section__copyright {
+		font-size: 11px;
+	}
 }
 
 
@@ -6735,6 +7014,8 @@ strong, .font-semibold {
 	}
 
 	.gallery-image-card {
+		height: clamp(150px, 22vw, 220px);
+		aspect-ratio: auto;
 		border-radius: 10px;
 		border-width: 1px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -6984,6 +7265,8 @@ strong, .font-semibold {
 	}
 
 	.gallery-image-card {
+		height: clamp(150px, 38vw, 180px);
+		aspect-ratio: auto;
 		border-radius: 8px;
 		border: none;
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
