@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-/* ── Animated counter hook ── */
+/* ── Cloudinary responsive URL helper ── */
+const cloudinaryResponsive = (url: string, width: number, quality = 'auto') => {
+  // Insert Cloudinary transforms after /upload/
+  return url.replace('/upload/', `/upload/w_${width},f_auto,q_${quality}/`)
+}
+
+/* ── Animated counter hook (uses requestAnimationFrame for perf) ── */
 const useCountUp = (end: number, duration = 2000, suffix = '') => {
   const [count, setCount] = useState(0)
   const [started, setStarted] = useState(false)
@@ -18,14 +24,16 @@ const useCountUp = (end: number, duration = 2000, suffix = '') => {
 
   useEffect(() => {
     if (!started) return
-    let start = 0
-    const step = end / (duration / 16)
-    const timer = setInterval(() => {
-      start += step
-      if (start >= end) { setCount(end); clearInterval(timer) }
-      else setCount(Math.floor(start))
-    }, 16)
-    return () => clearInterval(timer)
+    let startTime: number | null = null
+    let rafId: number
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      setCount(Math.floor(progress * end))
+      if (progress < 1) rafId = requestAnimationFrame(animate)
+    }
+    rafId = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(rafId)
   }, [started, end, duration])
 
   return { count: `${count}${suffix}`, ref }
@@ -37,10 +45,14 @@ const Hero = () => {
   const [isVisible, setIsVisible] = useState(false)
   const { openAuthModal } = useAuth()
 
-  const slides = [
+  // Detect mobile once for responsive image sizing
+  const isMobile = useMemo(() => window.innerWidth <= 768, [])
+
+  const slides = useMemo(() => [
     {
       id: 1,
       image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp',
+      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp', 800),
       title: 'VIT Bhimavaram',
       description: 'A hub of innovation and learning in the heart of Andhra Pradesh',
       duration: 5000,
@@ -49,6 +61,7 @@ const Hero = () => {
     {
       id: 2,
       image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg',
+      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg', 800),
       title: 'Behind the CSBS',
       description: 'Building the future of tech education at VIT Bhimavaram',
       duration: 5000,
@@ -57,13 +70,14 @@ const Hero = () => {
     {
       id: 3,
       image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png',
+      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png', 800),
       title: 'Computer Science & Business Systems',
       description: 'Empowering students with the skills and mindset to lead in the digital economy',
       duration: 5000,
       objectPosition: 'center center',
       objectFit: 'contain' as const,
     },
-  ]
+  ], [])
 
   // Entry animation
   useEffect(() => {
@@ -158,10 +172,14 @@ const Hero = () => {
               {slides.map((slide, index) => (
                 <div key={slide.id} className="hero__carousel-slide">
                   <img
-                    src={slide.image}
+                    src={isMobile ? slide.mobileSrc : slide.image}
                     alt={slide.title}
                     className="hero__carousel-image"
+                    width={isMobile ? 800 : 1200}
+                    height={isMobile ? 450 : 675}
                     loading={index < 2 ? 'eager' : 'lazy'}
+                    decoding={index === 0 ? 'sync' : 'async'}
+                    fetchPriority={index === 0 ? 'high' : undefined}
                     style={{
                       objectPosition: slide.objectPosition,
                       objectFit: slide.objectFit || 'cover',

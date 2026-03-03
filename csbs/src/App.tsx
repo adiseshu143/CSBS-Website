@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { useAuth } from './context/AuthContext'
 import { initializeConnectivityMonitoring } from './utils/connectivityCheck'
 import './App.css'
@@ -9,12 +9,22 @@ import AuthModal from './components/AuthModal'
 import { Achievements, Events, Team, Gallery, About, Footer, FAQ } from './components/Sections'
 import ProtectedRoute from './routes/ProtectedRoute'
 import ProtectedAdminRoute from './routes/ProtectedAdminRoute'
-import UserProfile from './pages/UserProfile'
-import AdminLogin from './pages/AdminLogin'
-import AdminProfile from './pages/AdminProfile'
-import AdminTeamManagement from './pages/AdminTeamManagement'
-import EventDetailsPage from './pages/EventDetailsPage'
-import AdminCreateEvent from './pages/AdminCreateEvent'
+
+/* ── Lazy-loaded pages (code-split for smaller initial bundle) ── */
+const UserProfile = lazy(() => import('./pages/UserProfile'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const AdminProfile = lazy(() => import('./pages/AdminProfile'))
+const AdminTeamManagement = lazy(() => import('./pages/AdminTeamManagement'))
+const EventDetailsPage = lazy(() => import('./pages/EventDetailsPage'))
+const AdminCreateEvent = lazy(() => import('./pages/AdminCreateEvent'))
+
+/* ── Loading fallback for lazy routes ── */
+const PageLoader = () => (
+	<div className="protected-loading">
+		<div className="protected-loading__spinner" />
+		<p className="protected-loading__text">Loading...</p>
+	</div>
+)
 
 /* ── Modern Premium Background Layer ──────────────────── */
 const Background = () => (
@@ -110,6 +120,7 @@ function App() {
 			{/* Permanent fixed background — orange curve, skyline bars, particles */}
 			<Background />
 			<Navbar />
+			<Suspense fallback={<PageLoader />}>
 			<Routes>
 				<Route path="/" element={<HomePage />} />
 
@@ -165,6 +176,7 @@ function App() {
 				{/* Catch-all → home */}
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
+			</Suspense>
 		</div>
 	)
 }

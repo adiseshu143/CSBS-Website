@@ -13,6 +13,10 @@ import { getTeamMembers } from '../api/teamApi'
 import type { TeamMember } from '../api/teamApi'
 import EventCard from './EventCard'
 
+/* ── Cloudinary responsive URL helper ── */
+const cloudinaryMobile = (url: string, width: number) =>
+  url.replace('/upload/', `/upload/w_${width},f_auto,q_auto/`)
+
 /* ── Scroll-reveal hook (animate once on viewport entry) ── */
 const useReveal = (threshold = 0.12) => {
   const ref = useRef<HTMLDivElement>(null)
@@ -49,6 +53,8 @@ const galleryImages = [
   { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515832/xntkrxrfnnog8x5orrtg.jpg', title: 'Guidance', position: 'top' },
   { src: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772515205/hexepks0wrpo8eclpnhh.jpg', title: 'Behind CSBS', position: 'center' },
 ]
+
+const isMobileDevice = window.innerWidth <= 768
 
 // Fallback team data (if Firebase fails)
 const defaultTeamMembers: TeamMember[] = [
@@ -205,22 +211,28 @@ export const Events = () => {
     }
 
     const fetchCounts = async () => {
+      // Fetch all registration counts in parallel instead of sequentially
+      const results = await Promise.all(
+        events.map(async (event) => {
+          try {
+            const stat = await getEventRegistrationCount(event.id)
+            return { id: event.id, stat }
+          } catch {
+            return { id: event.id, stat: { teamCount: 0, memberCount: 0 } }
+          }
+        })
+      )
       const stats: Record<string, { teamCount: number; memberCount: number }> = {}
-      for (const event of events) {
-        try {
-          const stat = await getEventRegistrationCount(event.id)
-          stats[event.id] = stat
-        } catch {
-          stats[event.id] = { teamCount: 0, memberCount: 0 }
-        }
-      }
+      for (const r of results) stats[r.id] = r.stat
       setRegistrationStats(stats)
     }
 
     if (events.length > 0) {
       fetchCounts()
-      // Refresh every 30 seconds (not 5s — reduces Firestore reads)
-      const interval = setInterval(fetchCounts, 30000)
+      // Refresh every 30 seconds, but pause when tab is hidden
+      const interval = setInterval(() => {
+        if (!document.hidden) fetchCounts()
+      }, 30000)
       return () => clearInterval(interval)
     }
   }, [events, user])
@@ -394,7 +406,15 @@ export const Team = () => {
             <div className={`team-member-card${m.photoUrl ? ' team-member-card--has-photo' : ''}`} key={m.id} style={m.cardBg ? { background: m.cardBg } : undefined}>
               {m.photoUrl ? (
                 <div className="team-member-card__photo-wrapper" style={m.cardBg ? { background: m.cardBg } : undefined}>
-                  <img src={m.photoUrl} alt={m.name} className="team-member-card__photo" />
+                  <img
+                    src={isMobileDevice ? cloudinaryMobile(m.photoUrl, 200) : m.photoUrl}
+                    alt={m.name}
+                    className="team-member-card__photo"
+                    loading="lazy"
+                    decoding="async"
+                    width="200"
+                    height="200"
+                  />
                 </div>
               ) : (
                 <div className="team-member-card__avatar-area" style={{ background: `linear-gradient(135deg, ${m.color}18, ${m.color}08)` }}>
@@ -456,7 +476,16 @@ export const Gallery = () => {
       <div className="gallery-grid">
         {galleryImages.map((img, i) => (
           <div className="gallery-image-card" key={i}>
-            <img src={img.src} alt={img.title} className="gallery-image-card__image" loading="lazy" style={{ objectPosition: img.position }} />
+            <img
+              src={isMobileDevice ? cloudinaryMobile(img.src, 400) : img.src}
+              alt={img.title}
+              className="gallery-image-card__image"
+              loading="lazy"
+              decoding="async"
+              width="400"
+              height="300"
+              style={{ objectPosition: img.position }}
+            />
             <div className="gallery-image-card__overlay">
               <span className="gallery-image-card__title">{img.title}</span>
             </div>
