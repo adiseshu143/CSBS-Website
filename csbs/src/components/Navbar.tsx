@@ -76,6 +76,8 @@ const Navbar = () => {
               src={LOGO_URL}
               alt="Techie Blazers CSBS Logo"
               className="navbar__logo-img"
+              width="40"
+              height="40"
             />
           </div>
           <div className="navbar__brand-text">
@@ -126,7 +128,7 @@ const Navbar = () => {
       </div>
 
       {menuOpen && (
-        <div className="navbar__mobile-menu">
+        <div className="navbar__mobile-menu" role="presentation">
           <nav className="navbar__mobile-links" aria-label="Mobile navigation">
             <a href="/" className={`navbar__mobile-link ${activeSection === 'home' ? 'navbar__mobile-link--active' : ''}`} onClick={(e) => { e.preventDefault(); closeMenu(); navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); setActiveSection('home') }}>Home</a>
             <a href="#about" className={`navbar__mobile-link ${activeSection === 'about' ? 'navbar__mobile-link--active' : ''}`} onClick={(e) => scrollToSection(e, 'about')}>About</a>

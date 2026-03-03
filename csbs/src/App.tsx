@@ -61,12 +61,14 @@ const HomePage = () => {
 		<>
 			<Hero />
 			<AuthModal />
-			<About />
-			<Team />
-			<Gallery />
-			<Events />
-			<Achievements />
-			<FAQ />
+			<main id="main-content">
+				<About />
+				<Team />
+				<Gallery />
+				<Events />
+				<Achievements />
+				<FAQ />
+			</main>
 			<Footer />
 		</>
 	)

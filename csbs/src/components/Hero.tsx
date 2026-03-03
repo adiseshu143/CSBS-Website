@@ -51,8 +51,7 @@ const Hero = () => {
   const slides = useMemo(() => [
     {
       id: 1,
-      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp',
-      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp', 800),
+      image: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505233/qjwrmosrliuxg8rkkwwm.webp', isMobile ? 800 : 1200),
       title: 'VIT Bhimavaram',
       description: 'A hub of innovation and learning in the heart of Andhra Pradesh',
       duration: 5000,
@@ -60,8 +59,7 @@ const Hero = () => {
     },
     {
       id: 2,
-      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg',
-      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg', 800),
+      image: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772504918/nxsyoflhtezbnemhgfry.jpg', isMobile ? 800 : 1200),
       title: 'Behind the CSBS',
       description: 'Building the future of tech education at VIT Bhimavaram',
       duration: 5000,
@@ -69,15 +67,14 @@ const Hero = () => {
     },
     {
       id: 3,
-      image: 'https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png',
-      mobileSrc: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png', 800),
+      image: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png', isMobile ? 800 : 1200),
       title: 'Computer Science & Business Systems',
       description: 'Empowering students with the skills and mindset to lead in the digital economy',
       duration: 5000,
       objectPosition: 'center center',
       objectFit: 'contain' as const,
     },
-  ], [])
+  ], [isMobile])
 
   // Entry animation
   useEffect(() => {
@@ -172,7 +169,7 @@ const Hero = () => {
               {slides.map((slide, index) => (
                 <div key={slide.id} className="hero__carousel-slide">
                   <img
-                    src={isMobile ? slide.mobileSrc : slide.image}
+                    src={slide.image}
                     alt={slide.title}
                     className="hero__carousel-image"
                     width={isMobile ? 800 : 1200}

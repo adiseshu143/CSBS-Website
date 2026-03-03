@@ -13,13 +13,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Preload hero LCP image (only for mobile where we use the transformed URL) -->
-    <link rel="preload" as="image" type="image/webp"
+    <!-- Preload hero LCP image (responsive: mobile & desktop) -->
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
       href="https://res.cloudinary.com/dapwxfafn/image/upload/w_800,f_auto,q_auto/v1772505233/qjwrmosrliuxg8rkkwwm.webp"
       media="(max-width: 768px)" />
+    <link rel="preload" as="image" type="image/webp" fetchpriority="high"
+      href="https://res.cloudinary.com/dapwxfafn/image/upload/w_1200,f_auto,q_auto/v1772505233/qjwrmosrliuxg8rkkwwm.webp"
+      media="(min-width: 769px)" />
 
-    <!-- Google Fonts (non-render-blocking) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" />
+    <!-- Google Fonts (non-render-blocking via media swap) -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />

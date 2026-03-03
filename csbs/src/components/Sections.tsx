@@ -14,7 +14,7 @@ import type { TeamMember } from '../api/teamApi'
 import EventCard from './EventCard'
 
 /* ── Cloudinary responsive URL helper ── */
-const cloudinaryMobile = (url: string, width: number) =>
+const cloudinaryOptimize = (url: string, width: number) =>
   url.replace('/upload/', `/upload/w_${width},f_auto,q_auto/`)
 
 /* ── Scroll-reveal hook (animate once on viewport entry) ── */
@@ -55,6 +55,8 @@ const galleryImages = [
 ]
 
 const isMobileDevice = window.innerWidth <= 768
+const galleryImgWidth = isMobileDevice ? 400 : 600
+const teamImgWidth = isMobileDevice ? 200 : 300
 
 // Fallback team data (if Firebase fails)
 const defaultTeamMembers: TeamMember[] = [
@@ -407,7 +409,7 @@ export const Team = () => {
               {m.photoUrl ? (
                 <div className="team-member-card__photo-wrapper" style={m.cardBg ? { background: m.cardBg } : undefined}>
                   <img
-                    src={isMobileDevice ? cloudinaryMobile(m.photoUrl, 200) : m.photoUrl}
+                    src={cloudinaryOptimize(m.photoUrl, teamImgWidth)}
                     alt={m.name}
                     className="team-member-card__photo"
                     loading="lazy"
@@ -477,7 +479,7 @@ export const Gallery = () => {
         {galleryImages.map((img, i) => (
           <div className="gallery-image-card" key={i}>
             <img
-              src={isMobileDevice ? cloudinaryMobile(img.src, 400) : img.src}
+              src={cloudinaryOptimize(img.src, galleryImgWidth)}
               alt={img.title}
               className="gallery-image-card__image"
               loading="lazy"
