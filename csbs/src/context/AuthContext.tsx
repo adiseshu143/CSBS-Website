@@ -8,7 +8,6 @@ import {
   logoutUser,
   adminLogin as adminLoginApi,
   initiateGoogleLogin,
-  initiateGitHubLogin,
   handleSocialRedirectResult,
   ensureSocialUserProfile,
   getErrorMessage,
@@ -43,7 +42,6 @@ interface AuthContextType {
   adminLogin: (email: string, accessCode: string) => Promise<void>
   register: (data: RegisterData) => Promise<void>
   loginGoogle: () => Promise<void>
-  loginGitHub: () => Promise<void>
   logout: () => void
   updateUserProfileImage: (imageUrl: string) => void
   updateUserDesignation: (designation: string) => void
@@ -127,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const profile = snap.data() as UserProfile
             setUser(toUser(profile))
             setVerifiedAdminCode(profile.role === 'admin')
-          } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'github.com')) {
+          } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com')) {
             // Social auth user without Firestore profile — create one
             const profile = await ensureSocialUserProfile(firebaseUser)
             setUser(toUser(profile))
@@ -214,16 +212,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // ── Social Login (GitHub) — redirect-based ───────────────
-  const loginGitHub = async () => {
-    try {
-      await initiateGitHubLogin()
-      // Page will redirect to GitHub, then back to the app
-    } catch (err) {
-      throw new Error(getErrorMessage(err))
-    }
-  }
-
   // ── Logout ──────────────────────────────────────────────
   const logout = async () => {
     setVerifiedAdminCode(false)
@@ -262,7 +250,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       adminLogin,
       register,
       loginGoogle,
-      loginGitHub,
       logout,
       updateUserProfileImage,
       updateUserDesignation,
