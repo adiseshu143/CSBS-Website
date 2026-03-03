@@ -55,7 +55,7 @@ const Hero = () => {
       title: 'VIT Bhimavaram',
       description: 'A hub of innovation and learning in the heart of Andhra Pradesh',
       duration: 5000,
-      objectPosition: 'center center',
+      objectPosition: 'center 20%',
     },
     {
       id: 2,
@@ -70,7 +70,7 @@ const Hero = () => {
       image: cloudinaryResponsive('https://res.cloudinary.com/dapwxfafn/image/upload/v1772505507/z8iavybzfh8zxverqslz.png', isMobile ? 800 : 1200),
       title: 'Computer Science & Business Systems',
       description: 'Empowering students with the skills and mindset to lead in the digital economy',
-      duration: 5000,
+      duration: 800,
       objectPosition: 'center center',
       objectFit: 'contain' as const,
     },
