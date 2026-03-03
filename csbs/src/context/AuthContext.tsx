@@ -7,8 +7,10 @@ import {
   registerUser,
   logoutUser,
   adminLogin as adminLoginApi,
-  loginWithGoogle,
-  loginWithGitHub,
+  initiateGoogleLogin,
+  initiateGitHubLogin,
+  handleSocialRedirectResult,
+  ensureSocialUserProfile,
   getErrorMessage,
   type UserRole,
   type RegisterPayload,
@@ -98,6 +100,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIntendedRoute(null)
   }, [])
 
+  // ── Handle social login redirect result on mount ──────
+  useEffect(() => {
+    handleSocialRedirectResult()
+      .then((result) => {
+        if (result) {
+          setUser(toUser(result.user))
+          closeAuthModal()
+        }
+      })
+      .catch((err) => {
+        console.error('[Social Redirect Error]', err)
+      })
+  }, [closeAuthModal])
+
   // ── Listen to Firebase auth state ───────────────────────
   useEffect(() => {
     // Let Firebase restore the existing session (persisted in IndexedDB).
@@ -108,6 +124,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
           if (snap.exists()) {
             setUser(toUser(snap.data() as UserProfile))
+          } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'github.com')) {
+            // Social auth user without Firestore profile — create one
+            const profile = await ensureSocialUserProfile(firebaseUser)
+            setUser(toUser(profile))
           } else {
             // Auth user exists but no Firestore profile — force cleanup
             await signOut(auth)
@@ -184,31 +204,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  // ── Social Login (Google) ───────────────────────────────
+  // ── Social Login (Google) — redirect-based ───────────────
   const loginGoogle = async () => {
-    setIsLoading(true)
     try {
-      const result = await loginWithGoogle()
-      setUser(toUser(result.user))
-      closeAuthModal()
+      await initiateGoogleLogin()
+      // Page will redirect to Google, then back to the app
     } catch (err) {
       throw new Error(getErrorMessage(err))
-    } finally {
-      setIsLoading(false)
     }
   }
 
-  // ── Social Login (GitHub) ───────────────────────────────
+  // ── Social Login (GitHub) — redirect-based ───────────────
   const loginGitHub = async () => {
-    setIsLoading(true)
     try {
-      const result = await loginWithGitHub()
-      setUser(toUser(result.user))
-      closeAuthModal()
+      await initiateGitHubLogin()
+      // Page will redirect to GitHub, then back to the app
     } catch (err) {
       throw new Error(getErrorMessage(err))
-    } finally {
-      setIsLoading(false)
     }
   }
 

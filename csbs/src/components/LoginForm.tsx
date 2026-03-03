@@ -33,10 +33,9 @@ const LoginForm = () => {
     setSocialLoading('google')
     try {
       await loginGoogle()
-      setSuccess(true)
+      // Page will redirect to Google — no further action needed here
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Google sign-in failed. Please try again.')
-    } finally {
       setSocialLoading(null)
     }
   }
@@ -46,10 +45,9 @@ const LoginForm = () => {
     setSocialLoading('github')
     try {
       await loginGitHub()
-      setSuccess(true)
+      // Page will redirect to GitHub — no further action needed here
     } catch (err) {
       setError(err instanceof Error ? err.message : 'GitHub sign-in failed. Please try again.')
-    } finally {
       setSocialLoading(null)
     }
   }

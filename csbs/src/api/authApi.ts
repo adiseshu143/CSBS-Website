@@ -3,9 +3,11 @@ import {
   signOut,
   updateProfile,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   GithubAuthProvider,
+  type User as FirebaseUser,
 } from 'firebase/auth'
 import {
   doc, setDoc, getDoc, deleteDoc, getDocs,
@@ -504,52 +506,35 @@ export const adminLogin = async (
 }
 
 
-// ─── Social Authentication (Google) ─────────────────────
-export const loginWithGoogle = async (): Promise<{ user: UserProfile; token: string }> => {
+// ─── Social Authentication (Google) — redirect-based ────
+export const initiateGoogleLogin = async (): Promise<void> => {
   const provider = new GoogleAuthProvider()
   provider.setCustomParameters({ prompt: 'select_account' })
+  await signInWithRedirect(auth, provider)
+}
 
-  const credential = await signInWithPopup(auth, provider)
-  const firebaseUser = credential.user
+// ─── Social Authentication (GitHub) — redirect-based ────
+export const initiateGitHubLogin = async (): Promise<void> => {
+  const provider = new GithubAuthProvider()
+  provider.addScope('user:email')
+  await signInWithRedirect(auth, provider)
+}
 
-  // Check if user profile exists
-  let profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
-
-  if (!profileSnap.exists()) {
-    // Create new user profile for social auth
-    const profile: UserProfile = {
-      uid: firebaseUser.uid,
-      name: firebaseUser.displayName || 'User',
-      email: firebaseUser.email || '',
-      rollNumber: '',
-      department: '',
-      role: 'user',
-      createdAt: new Date().toISOString(),
-      profileImage: firebaseUser.photoURL || undefined,
-    }
-    await setDoc(doc(db, 'users', firebaseUser.uid), profile)
-    profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
-  }
-
-  const profile = profileSnap.data() as UserProfile
+// ─── Handle redirect result on page load ────────────────
+export const handleSocialRedirectResult = async (): Promise<{ user: UserProfile; token: string } | null> => {
+  const result = await getRedirectResult(auth)
+  if (!result || !result.user) return null
+  const firebaseUser = result.user
+  const profile = await ensureSocialUserProfile(firebaseUser)
   const token = await firebaseUser.getIdToken()
-
   return { user: profile, token }
 }
 
-// ─── Social Authentication (GitHub) ────────────────────
-export const loginWithGitHub = async (): Promise<{ user: UserProfile; token: string }> => {
-  const provider = new GithubAuthProvider()
-  provider.addScope('user:email')
-
-  const credential = await signInWithPopup(auth, provider)
-  const firebaseUser = credential.user
-
-  // Check if user profile exists
+// ─── Create Firestore profile for social auth user if missing ─
+export const ensureSocialUserProfile = async (firebaseUser: FirebaseUser): Promise<UserProfile> => {
   let profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
 
   if (!profileSnap.exists()) {
-    // Create new user profile for social auth
     const profile: UserProfile = {
       uid: firebaseUser.uid,
       name: firebaseUser.displayName || 'User',
@@ -564,10 +549,7 @@ export const loginWithGitHub = async (): Promise<{ user: UserProfile; token: str
     profileSnap = await getDoc(doc(db, 'users', firebaseUser.uid))
   }
 
-  const profile = profileSnap.data() as UserProfile
-  const token = await firebaseUser.getIdToken()
-
-  return { user: profile, token }
+  return profileSnap.data() as UserProfile
 }
 
 
