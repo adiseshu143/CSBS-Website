@@ -97,18 +97,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // ── Handle social login redirect result on mount ──────
   // Only check for redirect result if the URL indicates a redirect callback
+  // This handles the case where user is redirected back from Google login
   useEffect(() => {
-    // Immediately check for redirect result without deferring
-    handleSocialRedirectResult()
-      .then((result) => {
+    const checkRedirectResult = async () => {
+      try {
+        const result = await handleSocialRedirectResult()
         if (result) {
+          console.log('[Social Auth] User logged in via redirect:', result.user.email)
           setUser(toUser(result.user))
           closeAuthModal()
+          // Use setTimeout to let state updates settle
+          setTimeout(() => {
+            const userProfile = toUser(result.user)
+            if (userProfile.role === 'admin') {
+              window.location.href = '/admin/profile'
+            } else {
+              window.location.href = '/user-profile'
+            }
+          }, 150)
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('[Social Redirect Error]', err)
-      })
+      }
+    }
+    checkRedirectResult()
   }, [closeAuthModal])
 
   // ── Listen to Firebase auth state ───────────────────────
