@@ -25,11 +25,13 @@ const AuthModal = () => {
     if (isAuthenticated && isAuthModalOpen) {
       closeAuthModal()
       // If there's an intended route, go there; otherwise go to profile
-      if (intendedRoute) {
-        navigate(intendedRoute, { replace: false })
-      } else {
-        navigate('/profile')
-      }
+      setTimeout(() => {
+        if (intendedRoute) {
+          navigate(intendedRoute, { replace: false })
+        } else {
+          navigate('/profile', { replace: false })
+        }
+      }, 50)
     }
   }, [isAuthenticated, isAuthModalOpen, closeAuthModal, navigate, intendedRoute])
 

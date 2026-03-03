@@ -98,20 +98,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // ── Handle social login redirect result on mount ──────
   // Only check for redirect result if the URL indicates a redirect callback
   useEffect(() => {
-    // Defer redirect check to avoid blocking initial render
-    const id = requestIdleCallback(() => {
-      handleSocialRedirectResult()
-        .then((result) => {
-          if (result) {
-            setUser(toUser(result.user))
-            closeAuthModal()
-          }
-        })
-        .catch((err) => {
-          console.error('[Social Redirect Error]', err)
-        })
-    }, { timeout: 2000 })
-    return () => cancelIdleCallback(id)
+    // Immediately check for redirect result without deferring
+    handleSocialRedirectResult()
+      .then((result) => {
+        if (result) {
+          setUser(toUser(result.user))
+          closeAuthModal()
+        }
+      })
+      .catch((err) => {
+        console.error('[Social Redirect Error]', err)
+      })
   }, [closeAuthModal])
 
   // ── Listen to Firebase auth state ───────────────────────
@@ -127,16 +124,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setVerifiedAdminCode(profile.role === 'admin')
           } else if (firebaseUser.providerData.some(p => p.providerId === 'google.com')) {
             // Social auth user without Firestore profile — create one
-            const profile = await ensureSocialUserProfile(firebaseUser)
-            setUser(toUser(profile))
-            setVerifiedAdminCode(profile.role === 'admin')
+            try {
+              const profile = await ensureSocialUserProfile(firebaseUser)
+              setUser(toUser(profile))
+              setVerifiedAdminCode(profile.role === 'admin')
+            } catch (err) {
+              // If ensureSocialUserProfile fails, sign out and clear state
+              console.error('[Social Profile Creation Error]', err)
+              await signOut(auth)
+              setVerifiedAdminCode(false)
+              setUser(null)
+            }
           } else {
             // Auth user exists but no Firestore profile — force cleanup
             await signOut(auth)
             setVerifiedAdminCode(false)
             setUser(null)
           }
-        } catch {
+        } catch (err) {
+          console.error('[Auth State Change Error]', err)
           setVerifiedAdminCode(false)
           setUser(null)
         }
