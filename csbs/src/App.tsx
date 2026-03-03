@@ -44,17 +44,6 @@ const HomePage = () => {
 			history.scrollRestoration = 'manual'
 		}
 		window.scrollTo(0, 0)
-
-		// Lock scroll during hero entrance animation, then unlock
-		document.body.style.overflow = 'hidden'
-		const timer = setTimeout(() => {
-			document.body.style.overflow = ''
-		}, 1200) // matches longest hero animation delay + duration
-
-		return () => {
-			clearTimeout(timer)
-			document.body.style.overflow = ''
-		}
 	}, [])
 
 	return (
@@ -110,10 +99,13 @@ const ProfileRedirect = () => {
 function App() {
 	const location = useLocation()
 
-	// Initialize connectivity monitoring on app startup
+	// Initialize connectivity monitoring after page is idle
 	useEffect(() => {
 		if (location.pathname === '/') {
-			initializeConnectivityMonitoring()
+			const id = requestIdleCallback(() => {
+				initializeConnectivityMonitoring()
+			}, { timeout: 5000 })
+			return () => cancelIdleCallback(id)
 		}
 	}, [location.pathname])
 

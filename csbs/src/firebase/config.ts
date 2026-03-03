@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import { getStorage } from 'firebase/storage'
 
 // ─── Firebase Configuration (from .env) ─────────────────
 // All sensitive keys are stored in .env file
@@ -25,7 +24,15 @@ export const auth = getAuth(app)
 // Firestore instance (for storing user profiles, events, registrations, etc.)
 export const db = getFirestore(app)
 
-// Firebase Storage instance (for event banners, etc.)
-export const storage = getStorage(app)
+// Firebase Storage — lazy loaded (only needed for uploads, not on initial page load)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _storage: any = null
+export const getStorageLazy = async () => {
+  if (!_storage) {
+    const { getStorage } = await import('firebase/storage')
+    _storage = getStorage(app)
+  }
+  return _storage
+}
 
 export default app

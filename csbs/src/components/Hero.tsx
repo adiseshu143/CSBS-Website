@@ -76,10 +76,9 @@ const Hero = () => {
     },
   ], [isMobile])
 
-  // Entry animation
+  // Entry animation — show immediately, don't delay
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timer)
+    setIsVisible(true)
   }, [])
 
   // Auto-advance carousel with per-slide duration
@@ -174,7 +173,7 @@ const Hero = () => {
                     className="hero__carousel-image"
                     width={isMobile ? 800 : 1200}
                     height={isMobile ? 450 : 675}
-                    loading={index < 2 ? 'eager' : 'lazy'}
+                    loading={index === 0 ? 'eager' : 'lazy'}
                     decoding={index === 0 ? 'sync' : 'async'}
                     fetchPriority={index === 0 ? 'high' : undefined}
                     style={{

@@ -101,17 +101,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   // ── Handle social login redirect result on mount ──────
+  // Only check for redirect result if the URL indicates a redirect callback
   useEffect(() => {
-    handleSocialRedirectResult()
-      .then((result) => {
-        if (result) {
-          setUser(toUser(result.user))
-          closeAuthModal()
-        }
-      })
-      .catch((err) => {
-        console.error('[Social Redirect Error]', err)
-      })
+    // Defer redirect check to avoid blocking initial render
+    const id = requestIdleCallback(() => {
+      handleSocialRedirectResult()
+        .then((result) => {
+          if (result) {
+            setUser(toUser(result.user))
+            closeAuthModal()
+          }
+        })
+        .catch((err) => {
+          console.error('[Social Redirect Error]', err)
+        })
+    }, { timeout: 2000 })
+    return () => cancelIdleCallback(id)
   }, [closeAuthModal])
 
   // ── Listen to Firebase auth state ───────────────────────

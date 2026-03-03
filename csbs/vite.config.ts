@@ -9,9 +9,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Split Firebase into its own chunk (~300-400 kB)
+          // Split Firebase into its own chunk (~110 kB)
           'firebase-core': ['firebase/app', 'firebase/auth'],
-          'firebase-services': ['firebase/firestore', 'firebase/storage'],
+          // Firestore loaded eagerly for data fetching (~200 kB)
+          'firebase-firestore': ['firebase/firestore'],
+          // Storage loaded lazily only when uploads are needed
+          'firebase-storage': ['firebase/storage'],
           // Split React + Router into a vendor chunk
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
         },

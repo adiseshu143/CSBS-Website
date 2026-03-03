@@ -14282,23 +14282,23 @@ strong, .font-semibold {
 
 .hero {
 	opacity: 0;
-	transition: opacity 0.6s ease;
+	transition: opacity 0.3s ease;
 }
 .hero--visible {
 	opacity: 1;
 }
 
 .hero--visible .hero__content {
-	animation: heroContentIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+	animation: heroContentIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
 }
 .hero--visible .hero__visual {
-	animation: heroVisualIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+	animation: heroVisualIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 .hero--visible .hero__badge {
-	animation: heroBadgeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+	animation: heroBadgeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
 }
 .hero--visible .hero__stats {
-	animation: heroStatsIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+	animation: heroStatsIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
 }
 
 @keyframes heroContentIn {
@@ -14409,11 +14409,13 @@ strong, .font-semibold {
 	border-radius: 2px;
 	animation: carouselProgress linear forwards;
 	animation-duration: 5s; /* fallback; overridden by inline style */
+	transform-origin: left center;
+	will-change: transform;
 }
 
 @keyframes carouselProgress {
-	from { width: 0%; }
-	to { width: 100%; }
+	from { transform: scaleX(0); }
+	to { transform: scaleX(1); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -14766,11 +14768,6 @@ strong, .font-semibold {
 	.footer-section {
 		content-visibility: auto;
 		contain-intrinsic-size: auto 500px;
-	}
-
-	/* ── Reduce will-change usage ── */
-	* {
-		will-change: auto !important;
 	}
 }
 
