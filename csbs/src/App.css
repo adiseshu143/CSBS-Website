@@ -1268,10 +1268,11 @@ strong, .font-semibold {
 
 @media (max-width: 480px) {
 	.hero__carousel {
-		height: 220px;
+		height: 180px;
 		border-radius: 14px;
 		width: 100%;
 		max-width: 100%;
+		margin: 0 auto;
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(248, 250, 252, 0.06) inset;
 	}
 }
@@ -1299,7 +1300,12 @@ strong, .font-semibold {
 	object-fit: cover;
 	object-position: center;
 	display: block;
-	aspect-ratio: 16 / 9;
+}
+
+@media (max-width: 480px) {
+	.hero__carousel-image {
+		aspect-ratio: auto;
+	}
 }
 
 .hero__carousel-overlay {
@@ -1323,8 +1329,10 @@ strong, .font-semibold {
 
 @media (max-width: 480px) {
 	.hero__carousel-overlay {
-		padding: 20px 10px 18px;
+		padding: 16px 8px 14px;
 		background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.75) 100%);
+		left: 0;
+		right: 0;
 	}
 }
 
@@ -1444,8 +1452,13 @@ strong, .font-semibold {
 	}
 }
 
-.hero__carousel-arrow--left { left: 14px; }
-.hero__carousel-arrow--right { right: 14px; }
+.hero__carousel-arrow--left { left: 10px; }
+.hero__carousel-arrow--right { right: 10px; }
+
+@media (max-width: 480px) {
+	.hero__carousel-arrow--left { left: 8px; }
+	.hero__carousel-arrow--right { right: 8px; }
+}
 
 .hero__carousel-dots {
 	position: absolute;
