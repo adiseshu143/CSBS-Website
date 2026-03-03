@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 // ─── Firebase Configuration (from .env) ─────────────────
 // All sensitive keys are stored in .env file
@@ -21,8 +21,14 @@ const app = initializeApp(firebaseConfig)
 // Firebase Auth instance
 export const auth = getAuth(app)
 
-// Firestore instance (for storing user profiles, events, registrations, etc.)
-export const db = getFirestore(app)
+// Firestore instance with offline persistence & long-polling fallback
+// - persistentLocalCache: caches data in IndexedDB for offline use
+// - experimentalAutoDetectLongPolling: avoids QUIC protocol errors
+//   by automatically falling back to HTTP long-polling when WebChannel fails
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  experimentalAutoDetectLongPolling: true,
+})
 
 // Firebase Storage — lazy loaded (only needed for uploads, not on initial page load)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
